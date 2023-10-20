@@ -1,0 +1,191 @@
+<div class="container-fluid d-flex flex-column h-100 gap-3 p-3">
+  <div class="containers p-3">
+    <h5>Overall Inventory</h5>
+    <div class="row">
+      <div class="col">
+        <h6 class="text-primary">Categories</h6>
+        <div class="row">
+          <p class="fw-bold">14</p>
+          <p class="text-secondary">Last 7 days</p>
+        </div>
+      </div>
+      <div class="col">
+        <h6 class="text-warning">Total Products</h6>
+        <div class="row">
+          <div class="col text-start">
+            <p class="fw-bold">14</p>
+            <p class="text-secondary">Last 7 days</p>
+          </div>
+          <div class="col text-end">
+            <p class="fw-bold">14</p>
+            <p class="text-secondary">Last 7 days</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <h6 style="color: blueviolet">Top Selling</h6>
+        <div class="row">
+          <div class="col text-start">
+            <p class="fw-bold">14</p>
+            <p class="text-secondary">Last 7 days</p>
+          </div>
+          <div class="col text-end">
+            <p class="fw-bold">14</p>
+            <p class="text-secondary">Last 7 days</p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <h6 class="text-danger">Low Stocks</h6>
+        <div class="row">
+          <div class="col text-start">
+            <p class="fw-bold">14</p>
+            <p class="text-secondary">Last 7 days</p>
+          </div>
+          <div class="col text-end">
+            <p class="fw-bold">14</p>
+            <p class="text-secondary">Last 7 days</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="containers p-3 h-100 d-flex flex-column">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5>Products</h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" [routerLink]="['/admin/add-product']">
+          Add Product
+        </button>
+        <button class="btn btn-outline-secondary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-filter"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"
+            />
+          </svg>
+          Filters
+        </button>
+        <button class="btn btn-outline-secondary">Download all</button>
+      </div>
+    </div>
+    <div class="container-fluid flex-grow-1">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Expiry Date</th>
+            <th scope="col">Availability</th>
+          </tr>
+        </thead>
+        <tbody *ngFor="let product of _PRODUCTS; index as index">
+          <tr [id]="index">
+            <th scope="row">{{ product.name }}</th>
+            <td>
+              <ng-container
+                *ngIf="product.variations.length === 0; else variation"
+              >
+                {{ product.price.toLocaleString('en-us',{
+                style: 'currency',
+      currency: 'PHP',
+              }) }}
+              </ng-container>
+              <ng-template #variation>
+                {{ findHighestLowestPrice(product.variations) }}
+              </ng-template>
+            </td>
+
+            <td>
+              {{ countStocks(product) }}
+            </td>
+            <td>{{ convertTimestamp(product.expiryDate) }}</td>
+            <td>
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <p
+                    *ngIf="countStocks(product) >= 20; else lowInStock"
+                    class="text-success"
+                  >
+                    In Stock
+                  </p>
+                  <ng-template #lowInStock>
+                    <p
+                      *ngIf="countStocks(product) > 0; else outOfStock"
+                      class="text-warning"
+                    >
+                      Low in Stock
+                    </p>
+                    <ng-template #outOfStock>
+                      <p class="text-danger">Out of Stock</p>
+                    </ng-template>
+                  </ng-template>
+                </div>
+                <div class="dropdown">
+                  <button
+                    class="btn btn-secondary btn-sm dropdown-toggle"
+                    type="button"
+                    (click)="selectedProduct(index)"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-three-dots-vertical"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
+                      />
+                    </svg>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <button class="dropdown-item" type="button">
+                        Edit Product
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        class="dropdown-item"
+                        type="button"
+                        (click)="deleteProductModal.show()"
+                      >
+                        Delete Product
+                      </button>
+                    </li>
+                    <li>
+                      <button class="dropdown-item" type="button">
+                        Add to Featured Products
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex align-items-center justify-content-between">
+      <button class="btn btn-outline-secondary">Previous</button>
+      <p class="text-secondary">Page 1 out of 10</p>
+      <button class="btn btn-outline-secondary">Next</button>
+    </div>
+  </div>
+</div>
+
+<app-delete-product-dialog
+  [product]="_selectedProduct"
+  (onSubmit)="deleteProduct(_selectedProduct!)"
+></app-delete-product-dialog>
