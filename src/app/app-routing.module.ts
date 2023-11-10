@@ -15,6 +15,9 @@ import { UsersComponent } from './views/admin/user/users/users.component';
 import { AuditComponent } from './views/admin/audit/audit.component';
 import { ContentsComponent } from './views/admin/contents/contents.component';
 import { AddProductComponent } from './views/inventory/add-product/add-product.component';
+import { StaffHomeComponent } from './views/staff/staff-home/staff-home.component';
+import { TransactionsComponent } from './views/staff/transactions/transactions.component';
+import { AddPestComponent } from './views/admin/add-pest/add-pest.component';
 
 const routes: Routes = [
   { path: ' ', redirectTo: 'login', pathMatch: 'full' },
@@ -25,7 +28,6 @@ const routes: Routes = [
     component: AdminMainComponent,
     children: [
       { path: '', component: DashboardComponent },
-
       { path: 'dashboard', component: DashboardComponent },
       { path: 'inventory', component: ProductComponent },
       { path: 'reports', component: ReportsComponent },
@@ -33,12 +35,19 @@ const routes: Routes = [
       { path: 'orders', component: OrdersComponent },
       { path: 'users', component: UsersComponent },
       { path: 'audit', component: AuditComponent },
-      { path: 'contents', component: ContentsComponent },
+      { path: 'contents', component: AddPestComponent },
       { path: 'add-product', component: AddProductComponent },
     ],
   },
 
-  { path: 'staff', component: StaffMainComponent },
+  {
+    path: 'staff',
+    component: StaffHomeComponent,
+  },
+  {
+    path: 'staff/transactions/:users',
+    component: TransactionsComponent,
+  },
   { path: 'login', component: LoginComponent },
 ];
 

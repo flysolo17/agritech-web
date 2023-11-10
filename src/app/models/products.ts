@@ -10,7 +10,7 @@ export interface Products {
   name: string;
   description: string;
   category: string;
-  cost: string;
+  cost: number;
   price: number;
   stocks: number;
   variations: Variation[];
@@ -25,3 +25,62 @@ export const productConverter = {
   toFirestore: (data: Products) => data,
   fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Products,
 };
+
+// export interface Variation {
+//   id: string;
+//   name: string;
+//   image: string;
+//   cost: number;
+//   price: number;
+//   stocks: number;
+// }
+
+export function productToOrder(product: Products): Order[] {
+  let orderList: Order[] = [];
+  if (product.variations.length == 0) {
+    orderList.push({
+      productID: product.id,
+      name: product.name,
+      category: product.category,
+      isVariation: false,
+      variatioID: '',
+      image: product.images[0],
+      cost: product.cost,
+      price: product.price,
+      quantity: 1,
+      stocks: product.stocks,
+      shippingInfo: product.shippingInformation,
+    });
+  } else {
+    product.variations.forEach((variation) => {
+      orderList.push({
+        productID: product.id,
+        name: variation.name,
+        category: product.category,
+        isVariation: true,
+        variatioID: variation.id,
+        image: variation.image,
+        cost: variation.cost,
+        price: variation.price,
+        quantity: 1,
+        stocks: variation.stocks,
+        shippingInfo: product.shippingInformation,
+      });
+    });
+  }
+  return orderList;
+}
+
+export interface Order {
+  productID: string;
+  name: string;
+  category: string;
+  isVariation: boolean;
+  variatioID: string;
+  image: string;
+  cost: number;
+  price: number;
+  quantity: number;
+  stocks: number;
+  shippingInfo: ShippingInfo;
+}

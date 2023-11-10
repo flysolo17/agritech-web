@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   Auth,
+  User,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -30,7 +31,7 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class AuthService {
   _collection_name = 'users';
-  user: Users | null = null;
+
   constructor(
     private auth: Auth,
     private firestore: Firestore,
@@ -105,7 +106,6 @@ export class AuthService {
     );
   }
   logout() {
-    this.user = null;
     this.auth.signOut();
   }
 }

@@ -15,36 +15,29 @@ declare var window: any;
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.css'],
 })
-export class ProductComponent implements OnInit, OnDestroy {
+export class ProductComponent implements OnInit {
   _products!: Observable<Products[]>;
 
   _selectedProduct: Products | null = null;
   _PRODUCTS: Products[] = [];
-  productSubscription: Subscription;
+
   deleteProductModal: any;
   constructor(
     private productService: ProductService,
     public dateService: DateConverterService,
     private toastr: ToastrService,
     public loadingService: LoadingService
-  ) {
-    this.productSubscription = new Subscription();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.deleteProductModal = new window.bootstrap.Modal(
       document.getElementById('deleteProductModal')
     );
-    this.productSubscription = this.productService
-      .getAllProducts()
-      .subscribe((data: Products[]) => {
-        this._PRODUCTS = data;
-        console.log(this._PRODUCTS);
-      });
+    this.productService.getAllProducts().subscribe((data: Products[]) => {
+      this._PRODUCTS = data;
+    });
   }
-  ngOnDestroy(): void {
-    this.productSubscription.unsubscribe();
-  }
+
   convertTimestamp(timestamp: any) {
     const date = new Date(
       timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
@@ -52,6 +45,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     return date.toLocaleDateString();
   }
   selectedProduct(index: number) {
+    console.log(index);
     if (this._PRODUCTS && index >= 0 && index < this._PRODUCTS.length) {
       this._selectedProduct = this._PRODUCTS[index];
     } else {

@@ -109,16 +109,15 @@ export class ProductService {
 
   deleteProductByID(productID: string): Observable<void> {
     const folder = ref(this.storage, `${this._collection_name}/${productID}`);
-    const variationFolder = ref(
-      this.storage,
-      `${this._collection_name}/${productID}/variation`
-    );
-    const variationDelete = listAll(variationFolder).then((data) =>
-      data.items.forEach((element) => {
-        deleteObject(element);
-      })
-    );
-
+    // const variationFolder = ref(
+    //   this.storage,
+    //   `${this._collection_name}/${productID}/variation`
+    // );
+    // const variationDelete = listAll(variationFolder).then((data) =>
+    //   data.items.forEach((element) => {
+    //     deleteObject(element);
+    //   })
+    // );
     const storageDelete = listAll(folder).then((data) => {
       data.items.forEach((element) => {
         deleteObject(element);

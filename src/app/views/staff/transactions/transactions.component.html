@@ -1,0 +1,105 @@
+<div class="container-fluid vh-100 bg-white">
+  <div class="d-flex flex-column align-items-center">
+    <h5>Transactions</h5>
+    <div style="width: 60%; flex-grow: 1">
+      <ul
+        class="nav nav-tabs"
+        id="myTab"
+        role="tablist"
+        style="align-items: start"
+      >
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="home-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#home-tab-pane"
+            type="button"
+            role="tab"
+            aria-controls="home-tab-pane"
+            aria-selected="true"
+          >
+            Recent
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="profile-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#profile-tab-pane"
+            type="button"
+            role="tab"
+            aria-controls="profile-tab-pane"
+            aria-selected="false"
+          >
+            All Transactions
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content h-100 border-1" id="myTabContent">
+        <div
+          class="tab-pane fade show active"
+          id="home-tab-pane"
+          role="tabpanel"
+          aria-labelledby="home-tab"
+          tabindex="0"
+        >
+          <h4>Recent</h4>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">ORDER DETAILS</th>
+                <th scope="col">CUSTOMER NAME</th>
+                <th scope="col">ORDER VALUE</th>
+                <th scope="col">IS ORDER PAID?</th>
+                <th scope="col">ORDER DATE</th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let transactions of _transactionList">
+              <tr>
+                <td>
+                  <div class="d-flex flex-column gap-1">
+                    <h6>ORDER ID : {{ transactions.id }}</h6>
+                    <h6 class="text-success">{{ transactions.type }}</h6>
+                  </div>
+                </td>
+                <td>
+                  <app-customer-info
+                    [customerID]="transactions.customerID"
+                  ></app-customer-info>
+                </td>
+                <td>
+                  <div>
+                    <p>
+                      <b>
+                        {{ transactions.payment.amount.toLocaleString('en-US', {
+                          style: 'currency',
+                          currency: 'PHP',
+                        })}}
+                      </b>
+
+                      - {{ transactions.payment.type }}
+                    </p>
+                  </div>
+                </td>
+                <td>{{ transactions.payment.status }}</td>
+                <td>{{ convertTimestamp(transactions.createdAt) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="profile-tab-pane"
+          role="tabpanel"
+          aria-labelledby="profile-tab"
+          tabindex="0"
+        >
+          <h4>All Transactions</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

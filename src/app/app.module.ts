@@ -31,7 +31,14 @@ import { AddUserComponent } from './views/admin/user/add-user/add-user.component
 import { AddProductComponent } from './views/inventory/add-product/add-product.component';
 import { AddVariationComponent } from './views/inventory/add-variation/add-variation.component';
 import { DeleteProductDialogComponent } from './components/delete-product-dialog/delete-product-dialog.component';
-
+import { CustomerInfoComponent } from './components/customer-info/customer-info.component';
+import { StaffHomeComponent } from './views/staff/staff-home/staff-home.component';
+import { TransactionsComponent } from './views/staff/transactions/transactions.component';
+import { ConfirmCheckoutComponent } from './views/staff/confirm-checkout/confirm-checkout.component';
+import { ViewOrdersComponent } from './views/staff/view-orders/view-orders.component';
+import { AddPestComponent } from './views/admin/add-pest/add-pest.component';
+import { FormsModule } from '@angular/forms';
+import { AddTopicComponent } from './views/admin/add-topic/add-topic.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -55,10 +62,18 @@ import { DeleteProductDialogComponent } from './components/delete-product-dialog
     AddProductComponent,
     AddVariationComponent,
     DeleteProductDialogComponent,
+    CustomerInfoComponent,
+    StaffHomeComponent,
+    TransactionsComponent,
+    ConfirmCheckoutComponent,
+    ViewOrdersComponent,
+    AddPestComponent,
+    AddTopicComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
+    FormsModule,
     AppRoutingModule,
     ReactiveFormsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),

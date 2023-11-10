@@ -42,3 +42,22 @@ body {
 .modal-header {
   border: 0;
 }
+
+.divider {
+  border-top: 1px solid #ccc;
+  margin: 5px 0;
+}
+
+.list-group-item {
+  border: none;
+}
+
+.single-line-ellipsis {
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Display an ellipsis (...) for overflow */
+  max-height: 1.2em; /* Set the maximum height for one line */
+  line-height: 1.2em; /* Match the line height to the max height */
+
+  border: 1px solid #ccc; /* Optional: add a border for visual clarity */
+}
