@@ -14,7 +14,12 @@
           </div>
           <div class="container">
             <img src="../../../../assets/images/Revenue.png" />
-            <span class="fw-bold text-secondary">P 30,000</span>
+            <span class="fw-bold text-secondary">{{
+              formatPrice(
+                _transactionCalculator.calculateTotalSales() -
+                  _transactionCalculator.calculateTotalCost()
+              )
+            }}</span>
             <p class="text-secondary">Revenue</p>
           </div>
 
@@ -64,12 +69,16 @@
         <div class="d-flex">
           <div class="container">
             <img src="../../../../assets/images/purchase.png" />
-            <span class="fw-bold text-secondary">P 30,000</span>
+            <span class="fw-bold text-secondary">{{
+              formatPrice(_transactionCalculator.calculateTotalCost())
+            }}</span>
             <p class="text-secondary">Purchases</p>
           </div>
           <div class="container">
             <img src="../../../../assets/images/sales2.png" />
-            <span class="fw-bold text-secondary">P 30,000</span>
+            <span class="fw-bold text-secondary">{{
+              formatPrice(_transactionCalculator.calculateTotalSales())
+            }}</span>
             <p class="text-secondary">Sales</p>
           </div>
 

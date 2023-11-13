@@ -161,7 +161,6 @@ export class AddProductComponent implements OnInit {
         height: this.productForm.controls['height'].value ?? 0,
         shipping: this.productForm.controls['shipping'].value ?? 0,
       },
-
       createdAt: Timestamp.now(),
       updatedAt: null,
       featured: false,

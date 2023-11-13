@@ -94,6 +94,7 @@ export class OrdersComponent implements OnInit {
 
   markAsComplete(transaction: Transactions, payment: Payment) {
     payment.status = PaymentStatus.PAID;
+
     this.transactionService
       .updateTransactionStatus(
         transaction.id,

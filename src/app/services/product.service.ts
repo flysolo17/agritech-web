@@ -75,7 +75,6 @@ export class ProductService {
         console.error('Error updating product: ', error);
       }
     }
-
     try {
       await batch.commit();
     } catch (error) {

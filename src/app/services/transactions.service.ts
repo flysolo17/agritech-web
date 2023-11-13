@@ -22,7 +22,8 @@ import { TrasactionDetails } from '../models/transaction/transaction_details';
 import { Payment, PaymentStatus } from '../models/transaction/payment';
 import * as dayjs from 'dayjs';
 import { TransactionType } from '../models/transaction/transaction_type';
-
+import { v4 as uuidv4 } from 'uuid';
+import { generateInvoiceID } from '../utils/constants';
 @Injectable({
   providedIn: 'root',
 })
@@ -70,7 +71,7 @@ export class TransactionsService {
   }
 
   createTransaction(transaction: Transactions) {
-    transaction.id = doc(collection(this.firestore, this._collection_name)).id;
+    transaction.id = generateInvoiceID();
     return setDoc(
       doc(collection(this.firestore, this._collection_name), transaction.id),
       transaction

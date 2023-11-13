@@ -20,6 +20,19 @@ import { TrasactionDetails } from '../models/transaction/transaction_details';
 //   return notifications;
 // };
 
+export function generateInvoiceID() {
+  // Get the current timestamp (milliseconds since the Unix epoch)
+  const timestamp = Date.now();
+
+  // Generate a random 5-digit number (between 0 and 99999)
+  const randomPart = Math.floor(Math.random() * 100000);
+
+  // Combine the timestamp and random number to create the 11-digit ID
+  const invoiceID = `${timestamp}${randomPart.toString().padStart(5, '0')}`;
+
+  return invoiceID;
+}
+
 export function formatTimestamp(timestamp: Timestamp): string {
   const date = timestamp.toDate();
   const options: Intl.DateTimeFormatOptions = {
