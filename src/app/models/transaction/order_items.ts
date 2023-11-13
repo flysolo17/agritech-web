@@ -7,6 +7,7 @@ export interface OrderItems {
   isVariation: boolean;
   variationID: string;
   quantity: number;
+  cost: number;
   price: number;
   imageUrl: string;
   shippingInfo: ShippingInfo;
@@ -21,6 +22,7 @@ export const ordersToOrderItems = (order: Order[]): OrderItems[] => {
       isVariation: order.isVariation,
       variationID: order.variatioID,
       quantity: order.quantity,
+      cost: order.cost,
       price: order.price,
       imageUrl: order.image,
       shippingInfo: order.shippingInfo,

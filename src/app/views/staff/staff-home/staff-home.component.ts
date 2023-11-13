@@ -152,7 +152,13 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadingService.showLoading('checkout');
     this.transactionService
       .createTransaction(transaction)
-      .then((task) => this.toastr.success('transasction success'))
+      .then(async (task) => {
+        await this.productService.batchUpdateProductQuantity(
+          transaction.orderList
+        );
+        this._productItems = [];
+        this.toastr.success('transasction success');
+      })
       .catch((err) => this.toastr.error(err.message))
       .finally(() => {
         this.loadingService.hideLoading('checkout');

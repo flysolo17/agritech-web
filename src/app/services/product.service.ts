@@ -13,6 +13,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  writeBatch,
 } from '@angular/fire/firestore';
 import {
   Storage,
@@ -25,6 +26,7 @@ import {
 
 import { Observable, catchError, forkJoin, switchMap } from 'rxjs';
 import { collectionData } from 'rxfire/firestore';
+import { OrderItems } from '../models/transaction/order_items';
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +44,43 @@ export class ProductService {
       doc(collection(this.firestore, this._collection_name), product.id),
       product
     );
+  }
+
+  async batchUpdateProductQuantity(orderItems: OrderItems[]) {
+    const batch = writeBatch(this.firestore);
+
+    for (const order of orderItems) {
+      const productDocRef = doc(
+        this.firestore,
+        this._collection_name,
+        order.productID
+      ).withConverter(productConverter);
+
+      try {
+        const productDocSnapshot = await getDoc(productDocRef);
+        if (productDocSnapshot.exists()) {
+          const productData = productDocSnapshot.data();
+
+          if (order.isVariation) {
+            productData.variations.forEach((e) => {
+              e.stocks -= order.quantity;
+            });
+          } else {
+            productData.stocks -= order.quantity;
+          }
+
+          await updateDoc(productDocRef, productData);
+        }
+      } catch (error) {
+        console.error('Error updating product: ', error);
+      }
+    }
+
+    try {
+      await batch.commit();
+    } catch (error) {
+      console.error('Error committing batch: ', error);
+    }
   }
 
   listenToProduct(productID: string) {

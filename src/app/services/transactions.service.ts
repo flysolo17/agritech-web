@@ -2,10 +2,13 @@ import { Injectable } from '@angular/core';
 import {
   FieldValue,
   Firestore,
+  Timestamp,
+  and,
   arrayUnion,
   collection,
   collectionData,
   doc,
+  getDocs,
   orderBy,
   query,
   setDoc,
@@ -17,12 +20,15 @@ import { Observable } from 'rxjs';
 import { TransactionStatus } from '../models/transaction/transaction_status';
 import { TrasactionDetails } from '../models/transaction/transaction_details';
 import { Payment, PaymentStatus } from '../models/transaction/payment';
+import * as dayjs from 'dayjs';
+import { TransactionType } from '../models/transaction/transaction_type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionsService {
   _collection_name = 'transactions';
+
   constructor(private firestore: Firestore) {}
   getAllTransactions(): Observable<Transactions[]> {
     const q = query(
@@ -31,6 +37,16 @@ export class TransactionsService {
     );
     return collectionData(q) as Observable<Transactions[]>;
   }
+
+  getAllOnlineTransactions(): Observable<Transactions[]> {
+    const q = query(
+      collection(this.firestore, this._collection_name),
+      where('type', 'in', [TransactionType.DELIVERY, TransactionType.PICK_UP]),
+      orderBy('createdAt', 'asc')
+    );
+    return collectionData(q) as Observable<Transactions[]>;
+  }
+
   updateTransactionStatus(
     transactionID: string,
     status: TransactionStatus,
@@ -42,7 +58,9 @@ export class TransactionsService {
       this._collection_name,
       transactionID
     );
-
+    if (status == TransactionStatus.COMPLETED) {
+      payment.status = PaymentStatus.PAID;
+    }
     const updatedData = {
       status: status,
       details: arrayUnion(details),
@@ -50,6 +68,7 @@ export class TransactionsService {
     };
     return updateDoc(transactionRef, updatedData);
   }
+
   createTransaction(transaction: Transactions) {
     transaction.id = doc(collection(this.firestore, this._collection_name)).id;
     return setDoc(
@@ -63,6 +82,69 @@ export class TransactionsService {
       where('cashierID', '==', cashierID),
       orderBy('createdAt', 'desc')
     );
+    return collectionData(q) as Observable<Transactions[]>;
+  }
+
+  // getTransactionByDate(
+  //   startDate: Date,
+  //   endDate: Date
+  // ): Observable<Transactions[]> {
+  //   const startTimestamp = Timestamp.fromDate(dayjs(startDate).toDate());
+  //   const endTimestamp = Timestamp.fromDate(dayjs(endDate).toDate());
+  //   const q = query(
+  //     collection(this.firestore, this._collection_name),
+  //     where('status', '==', TransactionStatus.COMPLETED),
+  //     where('createdAt', '>=', startTimestamp),
+  //     where('createdAt', '<=', endTimestamp),
+  //     orderBy('createdAt', 'desc')
+  //   );
+  //   return collectionData(q) as Observable<Transactions[]>;
+  // // }
+  // async getTransactionByDate(
+  //   startDate: Date,
+  //   endDate: Date
+  // ): Promise<Transactions[]> {
+  //   const startTimestamp = Timestamp.fromDate(
+  //     dayjs(startDate).startOf('day').toDate()
+  //   );
+  //   const endTimestamp = Timestamp.fromDate(
+  //     dayjs(endDate).endOf('day').toDate()
+  //   );
+  //   const q = query(
+  //     collection(this.firestore, this._collection_name),
+  //     where('status', '==', TransactionStatus.COMPLETED),
+  //     where('createdAt', '>=', startTimestamp),
+  //     where('createdAt', '<=', endTimestamp),
+  //     orderBy('createdAt', 'desc')
+  //   );
+
+  //   const querySnapshot = await getDocs(q);
+  //   const transactions: Transactions[] = [];
+  //   querySnapshot.forEach((doc) => {
+  //     transactions.push(doc.data() as Transactions);
+  //   });
+
+  //   return transactions;
+  // }
+
+  getTransactionsForCurrentYear(): Observable<Transactions[]> {
+    const currentYear = dayjs().year();
+
+    const startDate = dayjs(`${currentYear}-01-01`).startOf('day').toDate();
+
+    const endDate = dayjs(`${currentYear}-12-31`).endOf('day').toDate();
+
+    const startTimestamp = Timestamp.fromDate(startDate);
+    const endTimestamp = Timestamp.fromDate(endDate);
+
+    const q = query(
+      collection(this.firestore, this._collection_name),
+
+      where('createdAt', '>=', startTimestamp),
+      where('createdAt', '<=', endTimestamp),
+      orderBy('createdAt', 'desc')
+    );
+
     return collectionData(q) as Observable<Transactions[]>;
   }
 }

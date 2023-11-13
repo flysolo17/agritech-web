@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Timestamp } from '@angular/fire/firestore';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { ToastrService } from 'ngx-toastr';
@@ -161,7 +162,8 @@ export class AddProductComponent implements OnInit {
         shipping: this.productForm.controls['shipping'].value ?? 0,
       },
 
-      createdAt: new Date(),
+      createdAt: Timestamp.now(),
+      updatedAt: null,
       featured: false,
     };
     return product;

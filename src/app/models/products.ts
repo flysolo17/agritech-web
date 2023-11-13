@@ -1,8 +1,9 @@
-import { QueryDocumentSnapshot } from '@angular/fire/firestore';
+import { QueryDocumentSnapshot, Timestamp } from '@angular/fire/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
 import { Variation } from './variation';
 import { ShippingInfo } from './shipping';
+import { OrderItems } from './transaction/order_items';
 
 export interface Products {
   id: string;
@@ -18,7 +19,8 @@ export interface Products {
   reviews: [];
   shippingInformation: ShippingInfo;
   featured: boolean;
-  createdAt: Date;
+  createdAt: Timestamp;
+  updatedAt: Timestamp | null;
 }
 
 export const productConverter = {

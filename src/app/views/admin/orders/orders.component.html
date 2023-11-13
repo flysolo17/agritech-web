@@ -396,9 +396,7 @@
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
                 <button
-                  (click)="
-                    markAsComplete(transactions.id, transactions.payment)
-                  "
+                  (click)="markAsComplete(transactions, transactions.payment)"
                   class="btn btn-success"
                 >
                   Completed
@@ -457,9 +455,7 @@
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
                 <button
-                  (click)="
-                    markAsComplete(transactions.id, transactions.payment)
-                  "
+                  (click)="markAsComplete(transactions, transactions.payment)"
                   class="btn btn-success"
                 >
                   Completed
@@ -519,9 +515,7 @@
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
                 <button
-                  (click)="
-                    markAsComplete(transactions.id, transactions.payment)
-                  "
+                  (click)="markAsComplete(transactions, transactions.payment)"
                   class="btn btn-success"
                 >
                   Completed

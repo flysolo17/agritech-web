@@ -156,3 +156,17 @@ export function findProductById(
 ): Products | null {
   return productList.find((product) => product.id === idToFind) ?? null;
 }
+export const months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];

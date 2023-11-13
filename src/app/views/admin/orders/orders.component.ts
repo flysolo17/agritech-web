@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
 import { ToastrService } from 'ngx-toastr';
 import { Payment, PaymentStatus } from 'src/app/models/transaction/payment';
@@ -8,6 +8,7 @@ import { TransactionStatus } from 'src/app/models/transaction/transaction_status
 import { TransactionType } from 'src/app/models/transaction/transaction_type';
 import { Transactions } from 'src/app/models/transaction/transactions';
 import { LoadingService } from 'src/app/services/loading.service';
+import { ProductService } from 'src/app/services/product.service';
 import { TransactionsService } from 'src/app/services/transactions.service';
 import {
   formatTimestamp,
@@ -26,17 +27,15 @@ export class OrdersComponent implements OnInit {
   constructor(
     private transactionService: TransactionsService,
     public loadingService: LoadingService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef
   ) {}
   ngOnInit(): void {
-    this.transactionService.getAllTransactions().subscribe({
-      next: (value) => {
-        this._transactionList = value;
-        console.log(this._transactionList);
-      },
-      error(err) {
-        console.log('getAllTransactionFunc: ', err);
-      },
+    this.transactionService.getAllOnlineTransactions().subscribe((value) => {
+      this._transactionList = value;
+      console.log(this._transactionList);
+      this.cdr.detectChanges();
     });
   }
   convertTimestamp(timestamp: Timestamp) {
@@ -93,16 +92,21 @@ export class OrdersComponent implements OnInit {
       .catch((err) => this.toastrService.error(err.message));
   }
 
-  markAsComplete(transactionID: string, payment: Payment) {
+  markAsComplete(transaction: Transactions, payment: Payment) {
     payment.status = PaymentStatus.PAID;
     this.transactionService
       .updateTransactionStatus(
-        transactionID,
+        transaction.id,
         TransactionStatus.COMPLETED,
         generateTransactionDetails(TransactionStatus.COMPLETED),
         payment
       )
-      .then((value) => this.toastrService.success('Order completed!'))
+      .then(async (value) => {
+        await this.productService.batchUpdateProductQuantity(
+          transaction.orderList
+        );
+        this.toastrService.success('Order completed!');
+      })
       .catch((err) => this.toastrService.error(err.message));
   }
 

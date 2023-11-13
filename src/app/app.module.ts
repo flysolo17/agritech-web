@@ -39,6 +39,8 @@ import { ViewOrdersComponent } from './views/staff/view-orders/view-orders.compo
 import { AddPestComponent } from './views/admin/add-pest/add-pest.component';
 import { FormsModule } from '@angular/forms';
 import { AddTopicComponent } from './views/admin/add-topic/add-topic.component';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { NgChartsModule, NgChartsConfiguration } from 'ng2-charts';
 @NgModule({
   declarations: [
     AppComponent,
@@ -74,6 +76,8 @@ import { AddTopicComponent } from './views/admin/add-topic/add-topic.component';
     BrowserAnimationsModule,
     BrowserModule,
     FormsModule,
+    NgxDaterangepickerMd.forRoot(),
+    NgChartsModule.forRoot({ defaults: {} }),
     AppRoutingModule,
     ReactiveFormsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
