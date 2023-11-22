@@ -3,6 +3,7 @@ import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
 import { Users } from './models/users';
 import { user } from 'rxfire/auth';
+import { AuditLogService } from './services/audit-log.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,11 @@ import { user } from 'rxfire/auth';
 })
 export class AppComponent implements OnInit {
   title = 'agritech-web';
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private auditLogService: AuditLogService
+  ) {}
   ngOnInit(): void {
     this.authService.getCurrentUser().subscribe((value) => {
       if (value != null) {
@@ -26,7 +31,7 @@ export class AppComponent implements OnInit {
     this.authService.getUserAccount(uid).then((value) => {
       if (value.exists()) {
         const users: Users = value.data();
-
+        this.authService.setUser(users);
         this.identifyUser(users.type);
       } else {
         this.authService.logout();
@@ -38,8 +43,9 @@ export class AppComponent implements OnInit {
       this.router.navigate(['admin']);
     } else if (type === 'staff') {
       this.router.navigate(['staff']);
+    } else if (type === 'driver') {
+      this.router.navigate(['profile']);
     } else {
-      this.authService.logout();
       this.router.navigate(['notfound']);
     }
   }

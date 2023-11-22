@@ -1,0 +1,88 @@
+<div class="container-fluid vh-100 p-3">
+  <div class="d-flex gap-3 align-items-center">
+    <button class="btn btn-light" (click)="location.back()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-arrow-left"
+        viewBox="0 0 16 16"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+        />
+      </svg>
+    </button>
+    <h5>Review Transaction</h5>
+  </div>
+
+  <div class="d-flex gap-3 h-100 w-100">
+    <div class="box box-1" style="width: 30%">
+      <div class="d-flex flex-column">
+        <h5>Transaction info</h5>
+
+        <p class="no-margin">
+          Transaction ID : <b>{{ _transaction?.id }}</b>
+        </p>
+        <p class="no-margin">
+          Type : <b>{{ _transaction?.type }}</b>
+        </p>
+        <div *ngIf="isDelivery(_transaction?.type!)">
+          <hr />
+          <h5>Deliver Details</h5>
+          <p class="no-margin">
+            Receiver : {{ _transaction?.address?.contact?.name }}
+          </p>
+          <p class="no-margin">
+            Phone # : {{ _transaction?.address?.contact?.phone }}
+          </p>
+          <p class="no-margin">
+            Address : <b>{{ displayAddress(_transaction?.address!) }}</b>
+          </p>
+
+          <hr />
+          <h5>Driver Details</h5>
+          <app-staff-info
+            [staffID]="_transaction?.cashierID ?? ''"
+          ></app-staff-info>
+        </div>
+        <hr />
+        <h5>Payment info</h5>
+        <p class="no-margin">
+          Amount : <b>{{ _transaction?.payment?.amount }}</b>
+        </p>
+        <p class="no-margin">
+          Type : <b>{{ _transaction?.payment?.type }}</b>
+        </p>
+        <div class="d-flex align-items-center justify-content-between">
+          <p class="no-margin">
+            Status: <b>{{ _transaction?.payment?.status }}</b>
+          </p>
+          <button
+            class="btn btn-sm btn-light text-success"
+            *ngIf="isGcash(_transaction?.payment?.type!)"
+          >
+            View Receipt
+          </button>
+        </div>
+        <p class="no-margin">
+          Cash Receive :
+          <b>{{ _transaction?.payment?.details?.cashReceive }}</b>
+        </p>
+        <p class="no-margin">
+          Confirmed By :
+          <b>{{ _transaction?.payment?.details?.confirmedBy }}</b>
+        </p>
+        <p class="no-margin">
+          Payment Date :
+          <b>{{ paymentDate }}</b>
+        </p>
+      </div>
+    </div>
+    <div class="box box-2" style="width: 70%">
+      <h1>Test</h1>
+    </div>
+  </div>
+</div>

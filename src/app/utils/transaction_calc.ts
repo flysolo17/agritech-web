@@ -12,6 +12,7 @@ export class TransactionCalculator {
   constructor(transactions: Transactions[]) {
     this.transactions = transactions;
   }
+  
   calculateTotalSales(): number {
     let totalSales = 0;
     for (const transaction of this.transactions.filter(
@@ -23,6 +24,7 @@ export class TransactionCalculator {
     }
     return totalSales;
   }
+
   calculateTotalCost(): number {
     let totalCost = 0;
     for (const transaction of this.transactions.filter(
@@ -34,6 +36,8 @@ export class TransactionCalculator {
     }
     return totalCost;
   }
+
+
 
   calculateTopSellingStocks(): TopSellingStock[] {
     const orderList: OrderItems[] = this.transactions
@@ -57,6 +61,9 @@ export class TransactionCalculator {
         });
       }
     }
+
+
+
 
     const topSellingStocks: TopSellingStock[] = Array.from(
       topSellingStockMap.values()
@@ -95,6 +102,8 @@ export class TransactionCalculator {
     return totalSalesPerMonth;
   }
 
+
+  
   calculateTotalCostPerMonth(): Map<string, number> {
     const totalSalesPerMonth = new Map<string, number>();
     const currentYear = new Date().getFullYear();
@@ -221,6 +230,7 @@ export class TransactionCalculator {
     return uniqueCustomerIDs.size;
   }
 
+
   countCancelledTransactions() {
     return this.transactions.filter(
       (e) => e.status == TransactionStatus.CANCELLED
@@ -256,6 +266,8 @@ export class TransactionCalculator {
 
     return categorySalesArray;
   }
+
+
 
   // // more efficient
   // calculateTotalSalesAndCostPerMonth(): [

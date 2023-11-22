@@ -142,7 +142,7 @@
         aria-labelledby="list-pending-list"
       >
         <h5 class="text-danger">Pending Orders</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -209,6 +209,13 @@
                         : "Confirm"
                     }}
                   </button>
+
+                  <button
+                    class="btn btn-success"
+                    (click)="reviewTransaction(transactions)"
+                  >
+                    Review
+                  </button>
                 </div>
               </td>
             </tr>
@@ -223,7 +230,7 @@
         aria-labelledby="list-confirm-list"
       >
         <h5 class="text-success">Accepted</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -264,22 +271,32 @@
               <td>{{ transactions.payment.status }}</td>
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
-                <button
-                  *ngIf="transactions.type.toString() == 'PICK_UP'"
-                  class="btn btn-success"
-                  (click)="readyToPickUp(transactions.id, transactions.payment)"
-                >
-                  Ready to Pick Up
-                </button>
-                <button
-                  *ngIf="transactions.type.toString() == 'DELIVERY'"
-                  (click)="
-                    readyToDeliver(transactions.id, transactions.payment)
-                  "
-                  class="btn btn-danger"
-                >
-                  Ready to Deliver
-                </button>
+                <div class="d-flex gap-2">
+                  <button
+                    *ngIf="transactions.type.toString() == 'PICK_UP'"
+                    class="btn btn-success"
+                    (click)="
+                      readyToPickUp(transactions.id, transactions.payment)
+                    "
+                  >
+                    Ready to Pick Up
+                  </button>
+                  <button
+                    *ngIf="transactions.type.toString() == 'DELIVERY'"
+                    (click)="
+                      readyToDeliver(transactions.id, transactions.payment)
+                    "
+                    class="btn btn-danger"
+                  >
+                    Ready to Deliver
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    (click)="reviewTransaction(transactions)"
+                  >
+                    Review
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -292,7 +309,7 @@
         aria-labelledby="list-to-deliver-list"
       >
         <h5 class="text-success">TO DELIVER</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -333,14 +350,30 @@
               <td>{{ transactions.payment.status }}</td>
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
-                <button
-                  (click)="
-                    ongoingDeliver(transactions.id, transactions.payment)
-                  "
-                  class="btn btn-danger"
-                >
-                  Deliver Order
-                </button>
+                <div class="d-flex gap-2">
+                  <button
+                    *ngIf="transactions.cashierID === ''"
+                    class="btn btn-danger"
+                    (click)="selectTransaction(transactions)"
+                  >
+                    Add Driver
+                  </button>
+                  <button
+                    *ngIf="transactions.cashierID !== ''"
+                    (click)="
+                      ongoingDeliver(transactions.id, transactions.payment)
+                    "
+                    class="btn btn-danger"
+                  >
+                    Deliver Order
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    (click)="reviewTransaction(transactions)"
+                  >
+                    Review
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -354,7 +387,7 @@
         aria-labelledby="list-to-pick-list"
       >
         <h5 class="text-success">TO PICK UP</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -395,12 +428,21 @@
               <td>{{ transactions.payment.status }}</td>
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
-                <button
-                  (click)="markAsComplete(transactions, transactions.payment)"
-                  class="btn btn-success"
-                >
-                  Completed
-                </button>
+                <div class="d-flex gap-2">
+                  <button
+                    (click)="markAsComplete(transactions, transactions.payment)"
+                    class="btn btn-success"
+                  >
+                    Completed
+                  </button>
+
+                  <button
+                    class="btn btn-success"
+                    (click)="reviewTransaction(transactions)"
+                  >
+                    Review
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -413,7 +455,7 @@
         aria-labelledby="list-out-of-delivery-list"
       >
         <h5 class="text-success">OUT OF DELIVERY</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -473,7 +515,7 @@
         aria-labelledby="list-failed-list"
       >
         <h5 class="text-success">FAILED ORDERS</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -533,7 +575,7 @@
         aria-labelledby="list-completed-list"
       >
         <h5 class="text-success">COMPLETED ORDERS</h5>
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">ORDER DETAILS</th>
@@ -574,7 +616,21 @@
               <td>{{ transactions.payment.status }}</td>
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
-                <button class="btn btn-success">Review</button>
+                <div class="d-flex gap-2">
+                  <button
+                    *ngIf="!isPaid(transactions.payment)"
+                    class="btn btn-outline-secondary"
+                    (click)="selectTransactionForPayment(transactions)"
+                  >
+                    ADD PAYMENT
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    (click)="reviewTransaction(transactions)"
+                  >
+                    Review
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -583,3 +639,9 @@
     </div>
   </div>
 </div>
+
+<app-add-driver (onSelectDriver)="isDriverSelected($event)"></app-add-driver>
+<app-add-payment
+  (confirmOrder)="addPayment($event)"
+  [transaction]="selectedTransaction!"
+></app-add-payment>

@@ -1,8 +1,10 @@
+import { Timestamp } from '@angular/fire/firestore';
+
 export interface Payment {
   amount: number;
   type: PaymentType;
   status: PaymentStatus;
-  details?: PaymentDetails | null;
+  details: PaymentDetails | null;
 }
 export enum PaymentType {
   COD,
@@ -15,9 +17,10 @@ export enum PaymentStatus {
   PAID = 'PAID',
 }
 
-interface PaymentDetails {
+export interface PaymentDetails {
+  cashReceive: number;
   confirmedBy: string;
   reference: string;
   attachmentURL: string;
-  createdAt: Date;
+  createdAt: Timestamp;
 }

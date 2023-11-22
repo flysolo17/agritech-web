@@ -8,7 +8,7 @@ import { LoadingService } from 'src/app/services/loading.service';
   styleUrls: ['./delete-product-dialog.component.css'],
 })
 export class DeleteProductDialogComponent {
-  @Input() product: Products | null = null;
+  @Input() product!: Products;
   confirm: string = '';
   @Output() onSubmit = new EventEmitter<Products>();
   constructor(public loadingService: LoadingService) {}

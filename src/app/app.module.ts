@@ -41,6 +41,15 @@ import { FormsModule } from '@angular/forms';
 import { AddTopicComponent } from './views/admin/add-topic/add-topic.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgChartsModule, NgChartsConfiguration } from 'ng2-charts';
+import { ReviewTransactionComponent } from './views/admin/review-transaction/review-transaction.component';
+import { StaffInfoComponent } from './components/staff-info/staff-info.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { AddDriverComponent } from './components/add-driver/add-driver.component';
+import { AddPaymentComponent } from './components/add-payment/add-payment.component';
+import { ViewAuditComponent } from './views/admin/view-audit/view-audit.component';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { EditProductComponent } from './views/inventory/edit-product/edit-product.component';
+import { AddStocksComponent } from './views/inventory/add-stocks/add-stocks.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -71,11 +80,20 @@ import { NgChartsModule, NgChartsConfiguration } from 'ng2-charts';
     ViewOrdersComponent,
     AddPestComponent,
     AddTopicComponent,
+    ReviewTransactionComponent,
+    StaffInfoComponent,
+    ProfileComponent,
+    AddDriverComponent,
+    AddPaymentComponent,
+    ViewAuditComponent,
+    EditProductComponent,
+    AddStocksComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
     FormsModule,
+    NgxJsonViewerModule,
     NgxDaterangepickerMd.forRoot(),
     NgChartsModule.forRoot({ defaults: {} }),
     AppRoutingModule,

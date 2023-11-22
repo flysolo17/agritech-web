@@ -4,12 +4,15 @@ import { Timestamp, Transaction, or } from '@angular/fire/firestore';
 import * as bootstrap from 'bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
+import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Order, Products, productToOrder } from 'src/app/models/products';
 import { PaymentStatus, PaymentType } from 'src/app/models/transaction/payment';
 import { TransactionStatus } from 'src/app/models/transaction/transaction_status';
 import { TransactionType } from 'src/app/models/transaction/transaction_type';
 import { Transactions } from 'src/app/models/transaction/transactions';
+import { UserType } from 'src/app/models/user-type';
 import { Users } from 'src/app/models/users';
+import { AuditLogService } from 'src/app/services/audit-log.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
@@ -43,7 +46,8 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private authService: AuthService,
     private toastr: ToastrService,
     public loadingService: LoadingService,
-    private transactionService: TransactionsService
+    private transactionService: TransactionsService,
+    private auditService: AuditLogService
   ) {
     this._subscription = new Subscription();
   }
@@ -156,6 +160,18 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
         await this.productService.batchUpdateProductQuantity(
           transaction.orderList
         );
+
+        await this.auditService.saveAudit({
+          id: '',
+          email: this._users?.email ?? '',
+          role: UserType.STAFF,
+          action: ActionType.CREATE,
+          component: ComponentType.TRANSACTION,
+          payload: transaction,
+          details: 'adding transaction',
+          timestamp: Timestamp.now(),
+        });
+
         this._productItems = [];
         this.toastr.success('transasction success');
       })
@@ -165,7 +181,6 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this.closeModal();
         this._cart = [];
       });
-    console.log(transaction);
   }
 
   encodedUser() {

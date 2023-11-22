@@ -12,8 +12,10 @@ import {
   collection,
   doc,
   getDoc,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import { Users, userConverter } from '../models/users';
 import { collectionData } from 'rxfire/firestore';
@@ -26,18 +28,22 @@ import {
 } from '@angular/fire/storage';
 
 import { v4 as uuidv4 } from 'uuid';
+import { UserType } from '../models/user-type';
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   _collection_name = 'users';
-
+  users: Users | null = null;
   constructor(
     private auth: Auth,
     private firestore: Firestore,
     private storage: Storage
   ) {}
 
+  setUser(user: Users) {
+    this.users = user;
+  }
   getCurrentUser() {
     return user(this.auth);
   }
@@ -74,6 +80,13 @@ export class AuthService {
     );
   }
 
+  getAllDrivers() {
+    const q = query(
+      collection(this.firestore, this._collection_name),
+      where('type', '==', UserType.DRIVER)
+    );
+    return collectionData(q) as Observable<Users[]>;
+  }
   forgotPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
   }

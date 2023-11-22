@@ -57,7 +57,8 @@
         <tbody *ngFor="let users of _users | async; index as index">
           <tr>
             <th scope="row">{{ users.name }}</th>
-            <td>{{ users.phone }}</td>
+            <td>{{ users.type }}</td>
+            <td>+63 {{ users.phone }}</td>
             <td>{{ users.address }}</td>
             <td>
               <div class="d-flex gap-3" style="white-space: nowrap">

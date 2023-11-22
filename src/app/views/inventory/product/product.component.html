@@ -76,7 +76,7 @@
       </div>
     </div>
     <div class="container-fluid flex-grow-1">
-      <table class="table">
+      <table class="table table-hover">
         <thead>
           <tr>
             <th scope="col">Product</th>
@@ -87,7 +87,7 @@
           </tr>
         </thead>
         <tbody *ngFor="let product of _PRODUCTS; index as index">
-          <tr [id]="index">
+          <tr [id]="index" (click)="viewProduct(product)">
             <th scope="row">{{ product.name }}</th>
             <td>
               <ng-container
@@ -186,6 +186,6 @@
 </div>
 
 <app-delete-product-dialog
-  [product]="_selectedProduct"
+  [product]="_selectedProduct!"
   (onSubmit)="deleteProduct(_selectedProduct!)"
 ></app-delete-product-dialog>

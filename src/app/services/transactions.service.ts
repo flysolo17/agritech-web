@@ -59,9 +59,7 @@ export class TransactionsService {
       this._collection_name,
       transactionID
     );
-    if (status == TransactionStatus.COMPLETED) {
-      payment.status = PaymentStatus.PAID;
-    }
+
     const updatedData = {
       status: status,
       details: arrayUnion(details),
@@ -86,6 +84,23 @@ export class TransactionsService {
     return collectionData(q) as Observable<Transactions[]>;
   }
 
+  addDriver(transactionID: string, uid: string) {
+    return updateDoc(
+      doc(this.firestore, this._collection_name, transactionID),
+      {
+        cashierID: uid,
+      }
+    );
+  }
+
+  addPayment(transactionID: string, payment: Payment) {
+    return updateDoc(
+      doc(this.firestore, this._collection_name, transactionID),
+      {
+        payment: payment,
+      }
+    );
+  }
   // getTransactionByDate(
   //   startDate: Date,
   //   endDate: Date

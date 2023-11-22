@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
+import { NavigationExtras, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subscription } from 'rxjs';
 
@@ -26,6 +27,7 @@ export class ProductComponent implements OnInit {
     private productService: ProductService,
     public dateService: DateConverterService,
     private toastr: ToastrService,
+    private router: Router,
     public loadingService: LoadingService
   ) {}
 
@@ -96,5 +98,14 @@ export class ProductComponent implements OnInit {
         this.loadingService.hideLoading(data.id);
       },
     });
+  }
+
+  viewProduct(product: Products) {
+    const navigationExtras: NavigationExtras = {
+      queryParams: {
+        product: JSON.stringify(product),
+      },
+    };
+    this.router.navigate(['admin/view-product'], navigationExtras);
   }
 }

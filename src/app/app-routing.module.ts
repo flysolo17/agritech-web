@@ -18,6 +18,10 @@ import { AddProductComponent } from './views/inventory/add-product/add-product.c
 import { StaffHomeComponent } from './views/staff/staff-home/staff-home.component';
 import { TransactionsComponent } from './views/staff/transactions/transactions.component';
 import { AddPestComponent } from './views/admin/add-pest/add-pest.component';
+import { ReviewTransactionComponent } from './views/admin/review-transaction/review-transaction.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { ViewAuditComponent } from './views/admin/view-audit/view-audit.component';
+import { ViewProductComponent } from './views/inventory/view-product/view-product.component';
 
 const routes: Routes = [
   { path: ' ', redirectTo: 'login', pathMatch: 'full' },
@@ -30,11 +34,20 @@ const routes: Routes = [
       { path: '', component: DashboardComponent },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'inventory', component: ProductComponent },
+      { path: 'view-product', component: ViewProductComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'customer', component: CustomerComponent },
       { path: 'orders', component: OrdersComponent },
+      {
+        path: 'review-transactions',
+        component: ReviewTransactionComponent,
+      },
       { path: 'users', component: UsersComponent },
       { path: 'audit', component: AuditComponent },
+      {
+        path: 'view-audit',
+        component: ViewAuditComponent,
+      },
       { path: 'contents', component: AddPestComponent },
       { path: 'add-product', component: AddProductComponent },
     ],
@@ -47,6 +60,10 @@ const routes: Routes = [
   {
     path: 'staff/transactions/:users',
     component: TransactionsComponent,
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
   },
   { path: 'login', component: LoginComponent },
 ];

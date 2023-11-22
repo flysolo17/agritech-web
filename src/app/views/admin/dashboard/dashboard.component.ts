@@ -20,12 +20,13 @@ import { ProductCalculator } from 'src/app/utils/product_calc';
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-  public barChartOptions = {
-    responsive: true,
-  };
+
   _products: Products[] = [];
   _productItems: Order[] = [];
   _lowStocks: Order[] = [];
+  public barChartOptions = {
+    responsive: true,
+  };
   public barChartLabels: string[] = [];
   public barChartType: string = 'bar';
   public barChartLegend: boolean = true;

@@ -6,7 +6,11 @@ import {
   OrderItems,
   ordersToOrderItems,
 } from 'src/app/models/transaction/order_items';
-import { PaymentStatus, PaymentType } from 'src/app/models/transaction/payment';
+import {
+  PaymentDetails,
+  PaymentStatus,
+  PaymentType,
+} from 'src/app/models/transaction/payment';
 import { TrasactionDetails } from 'src/app/models/transaction/transaction_details';
 import { TransactionStatus } from 'src/app/models/transaction/transaction_status';
 import { TransactionType } from 'src/app/models/transaction/transaction_type';
@@ -39,6 +43,13 @@ export class ConfirmCheckoutComponent {
       status: TransactionStatus.COMPLETED,
       updatedAt: Timestamp.now(),
     };
+    let paymentDetails: PaymentDetails = {
+      confirmedBy: this.users?.name ?? '',
+      reference: '',
+      attachmentURL: '',
+      createdAt: Timestamp.now(),
+      cashReceive: cash,
+    };
     let transaction: Transactions = {
       id: '',
       customerID: '',
@@ -51,6 +62,7 @@ export class ConfirmCheckoutComponent {
         amount: this.subtotal(this.orders),
         type: PaymentType.PAY_IN_COUNTER,
         status: PaymentStatus.PAID,
+        details: paymentDetails,
       },
       details: [details],
       createdAt: Timestamp.now(),

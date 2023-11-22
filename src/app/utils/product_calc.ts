@@ -47,6 +47,8 @@ export class ProductCalculator {
     return count;
   }
 
+
+  
   getTotalPurchases() {
     let totalPurchase = 0;
     this.products.map((e) => {
@@ -60,6 +62,8 @@ export class ProductCalculator {
     });
     return totalPurchase;
   }
+
+  
   getTotalSalesValue() {
     let totalSales = 0;
     this.products.map((e) => {
@@ -73,4 +77,6 @@ export class ProductCalculator {
     });
     return totalSales;
   }
+
+
 }

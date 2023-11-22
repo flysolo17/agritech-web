@@ -19,7 +19,12 @@ export class TransactionsComponent implements OnInit {
   _users: Users | null = null;
   _transactionList: Transactions[] = [];
 
+
+  
   _reports: Reports[] = [];
+
+
+
   constructor(
     private transactionService: TransactionsService,
     private authService: AuthService,
