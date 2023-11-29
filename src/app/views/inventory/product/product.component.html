@@ -54,9 +54,13 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h5>Products</h5>
       <div class="d-flex gap-2">
-        <button class="btn btn-primary" [routerLink]="['/admin/add-product']">
+        <button
+          class="btn btn-primary"
+          [routerLink]="['/' + getUserType() + '/add-product']"
+        >
           Add Product
         </button>
+
         <button class="btn btn-outline-secondary">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +110,7 @@
             <td>
               {{ countStocks(product) }}
             </td>
-            <td>{{ convertTimestamp(product.expiryDate) }}</td>
+            <td>{{ product.expiryDate.toLocaleDateString() }}</td>
             <td>
               <div class="d-flex align-items-center justify-content-between">
                 <div>
@@ -155,15 +159,7 @@
                         Edit Product
                       </button>
                     </li>
-                    <li>
-                      <button
-                        class="dropdown-item"
-                        type="button"
-                        (click)="deleteProductModal.show()"
-                      >
-                        Delete Product
-                      </button>
-                    </li>
+
                     <li>
                       <button class="dropdown-item" type="button">
                         Add to Featured Products
@@ -184,8 +180,3 @@
     </div>
   </div>
 </div>
-
-<app-delete-product-dialog
-  [product]="_selectedProduct!"
-  (onSubmit)="deleteProduct(_selectedProduct!)"
-></app-delete-product-dialog>

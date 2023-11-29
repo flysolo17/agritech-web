@@ -19,13 +19,38 @@ export interface Products {
   reviews: [];
   shippingInformation: ShippingInfo;
   featured: boolean;
-  createdAt: Timestamp;
-  updatedAt: Timestamp | null;
+  createdAt: Date;
+  updatedAt: Date | null;
 }
 
 export const productConverter = {
-  toFirestore: (data: Products) => data,
-  fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Products,
+  toFirestore: (data: Products) => {
+    const convertedData: Products = { ...data };
+
+    if (convertedData.createdAt instanceof Date) {
+      convertedData.createdAt = new Date(convertedData.createdAt);
+    }
+
+    return { ...convertedData };
+  },
+  fromFirestore: (snap: QueryDocumentSnapshot) => {
+    const data = snap.data() as Products;
+
+    // Convert Firestore Timestamps to JavaScript Dates
+    if (data.expiryDate instanceof Timestamp) {
+      data.expiryDate = data.expiryDate.toDate();
+    }
+
+    if (data.createdAt instanceof Timestamp) {
+      data.createdAt = data.createdAt.toDate();
+    }
+
+    if (data.updatedAt instanceof Timestamp) {
+      data.updatedAt = data.updatedAt.toDate();
+    }
+
+    return data;
+  },
 };
 
 // export interface Variation {

@@ -1,4 +1,4 @@
-<div class="container-fluid vh-100 bg-secondary p-3">
+<div class="container-fluid vh-100 p-3">
   <div class="container-fluid bg-white h-100 border rounded p-3">
     <div class="d-flex align-items-center justify-content-between mb-2">
       <h5>{{ _product?.name }}</h5>
@@ -6,7 +6,10 @@
         <button class="btn btn-danger" (click)="deleteProductModal.show()">
           DELETE
         </button>
-        <button class="btn btn-outline-secondary">
+        <button
+          class="btn btn-outline-secondary"
+          (click)="editProduct(_product!)"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -106,8 +109,9 @@
   </div>
 </div>
 
-<app-delete-product-dialog
-  *ngIf="_product !== null"
-  [product]="_product"
-  (onSubmit)="deleteProduct(_product)"
-></app-delete-product-dialog>
+<div *ngIf="_product !== null">
+  <app-delete-product-dialog
+    [product]="_product"
+    (onSubmit)="deleteProduct($event)"
+  ></app-delete-product-dialog>
+</div>

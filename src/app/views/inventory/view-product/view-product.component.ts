@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Products } from 'src/app/models/products';
@@ -32,6 +32,7 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private toastr: ToastrService,
     private location: Location,
+    private router: Router,
     private auditLogService: AuditLogService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -44,12 +45,13 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
     this.activatedRoute.queryParams.subscribe((params) => {
       const products = params['product'];
       this._product = JSON.parse(products);
+
       this.cdr.detectChanges();
     });
   }
 
   deleteProduct(data: Products) {
-    this.loadingService.showLoading(data.id);
+    this.loadingService.showLoading('deleting');
     this.productService.deleteProductByID(data.id).subscribe({
       next: async (v) => {
         await this.auditLogService.saveAudit({
@@ -63,6 +65,8 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
           timestamp: Timestamp.now(),
         });
 
+        this.deleteProductModal.hide();
+        this.loadingService.hideLoading('deleting');
         this.toastr.success(
           `${data.name} deleted successfully!`,
           'Deletion Successful'
@@ -72,11 +76,17 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
       error: (v) => {
         this.toastr.error(v.message, 'Error Deleting product');
       },
-
-      complete: () => {
-        this.deleteProductModal.hide();
-        this.loadingService.hideLoading(data.id);
-      },
     });
+  }
+  editProduct(product: Products) {
+    const navigationExtras: NavigationExtras = {
+      queryParams: {
+        product: JSON.stringify(product),
+      },
+    };
+    this.router.navigate(
+      [this.authService.users?.type + '/edit-product'],
+      navigationExtras
+    );
   }
 }

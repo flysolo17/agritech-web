@@ -22,16 +22,16 @@ import { ReviewTransactionComponent } from './views/admin/review-transaction/rev
 import { ProfileComponent } from './components/profile/profile.component';
 import { ViewAuditComponent } from './views/admin/view-audit/view-audit.component';
 import { ViewProductComponent } from './views/inventory/view-product/view-product.component';
-
+import { EditProductComponent } from './views/inventory/edit-product/edit-product.component';
 const routes: Routes = [
-  { path: ' ', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'notfound', component: NotFoundComponent },
   { path: 'signup', component: SignupComponent },
   {
     path: 'admin',
     component: AdminMainComponent,
     children: [
-      { path: '', component: DashboardComponent },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'inventory', component: ProductComponent },
       { path: 'view-product', component: ViewProductComponent },
@@ -50,22 +50,38 @@ const routes: Routes = [
       },
       { path: 'contents', component: AddPestComponent },
       { path: 'add-product', component: AddProductComponent },
+      { path: 'edit-product', component: EditProductComponent },
     ],
   },
 
   {
     path: 'staff',
-    component: StaffHomeComponent,
+    component: StaffMainComponent,
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: StaffHomeComponent },
+      { path: 'inventory', component: ProductComponent },
+      { path: 'add-product', component: AddProductComponent },
+      { path: 'edit-product', component: EditProductComponent },
+      { path: 'view-product', component: ViewProductComponent },
+      { path: 'orders', component: OrdersComponent },
+      {
+        path: 'review-transactions',
+        component: ReviewTransactionComponent,
+      },
+      {
+        path: 'transactions',
+        component: TransactionsComponent,
+      },
+    ],
   },
-  {
-    path: 'staff/transactions/:users',
-    component: TransactionsComponent,
-  },
+
   {
     path: 'profile',
     component: ProfileComponent,
   },
   { path: 'login', component: LoginComponent },
+
 ];
 
 @NgModule({

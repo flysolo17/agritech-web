@@ -4,10 +4,15 @@ import { Timestamp } from '@angular/fire/firestore';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { ToastrService } from 'ngx-toastr';
+import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Products } from 'src/app/models/products';
+import { UserType } from 'src/app/models/user-type';
 import { Variation } from 'src/app/models/variation';
+import { AuditLogService } from 'src/app/services/audit-log.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
+import { generateInvoiceID } from 'src/app/utils/constants';
 import { v4 as uuidv4 } from 'uuid';
 declare var window: any;
 @Component({
@@ -32,18 +37,19 @@ export class AddProductComponent implements OnInit {
     cost: new FormControl(0, Validators.required),
     price: new FormControl(0, Validators.required),
     stocks: new FormControl(0, Validators.required),
-    weight: new FormControl(0, Validators.required),
-    width: new FormControl(0),
-    height: new FormControl(0),
+    minimum: new FormControl(0, Validators.required),
+
     shipping: new FormControl(0, Validators.required),
   });
   constructor(
     private productService: ProductService,
     public loadingService: LoadingService,
     private toaster: ToastrService,
-    public location: Location
+    public location: Location,
+    private authService: AuthService,
+    private auditService: AuditLogService
   ) {
-    this.productID = uuidv4();
+    this.productID = generateInvoiceID();
   }
   ngOnInit(): void {
     this.createVariationModal = new window.bootstrap.Modal(
@@ -116,9 +122,19 @@ export class AddProductComponent implements OnInit {
   saveProduct(product: Products) {
     this.productService
       .addProduct(product)
-      .then((data) =>
-        this.toaster.success('new product added', 'Product added!')
-      )
+      .then(async (data) => {
+        await this.auditService.saveAudit({
+          id: '',
+          email: this.authService.users?.email || '',
+          role: this.authService.users?.type || UserType.ADMIN,
+          action: ActionType.CREATE,
+          component: ComponentType.INVENTORY,
+          payload: product,
+          details: 'adding  product',
+          timestamp: Timestamp.now(),
+        });
+        this.toaster.success('new product added', 'Product added!');
+      })
       .catch((err) => this.toaster.error(err.message, 'Error'))
       .finally(() => {
         this.loadingService.hideLoading('add-product');
@@ -156,12 +172,10 @@ export class AddProductComponent implements OnInit {
       expiryDate: new Date(this.productForm.controls['expire'].value),
       reviews: [],
       shippingInformation: {
-        weight: this.productForm.controls['weight'].value ?? 0,
-        width: this.productForm.controls['width'].value ?? 0,
-        height: this.productForm.controls['height'].value ?? 0,
+        minimum: this.productForm.controls['minimum'].value ?? 0,
         shipping: this.productForm.controls['shipping'].value ?? 0,
       },
-      createdAt: Timestamp.now(),
+      createdAt: new Date(),
       updatedAt: null,
       featured: false,
     };

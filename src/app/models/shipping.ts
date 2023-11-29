@@ -1,6 +1,4 @@
 export interface ShippingInfo {
-  weight: number;
-  width: number;
-  height: number;
+  minimum: number;
   shipping: number;
 }

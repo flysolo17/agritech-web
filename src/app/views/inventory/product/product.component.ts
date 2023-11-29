@@ -6,11 +6,12 @@ import { Observable, Subscription } from 'rxjs';
 
 import { Products } from 'src/app/models/products';
 import { Variation } from 'src/app/models/variation';
+import { AuthService } from 'src/app/services/auth.service';
 import { DateConverterService } from 'src/app/services/date-converter.service';
 import { LoadingService } from 'src/app/services/loading.service';
 
 import { ProductService } from 'src/app/services/product.service';
-declare var window: any;
+
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
@@ -22,19 +23,16 @@ export class ProductComponent implements OnInit {
   _selectedProduct: Products | null = null;
   _PRODUCTS: Products[] = [];
 
-  deleteProductModal: any;
   constructor(
     private productService: ProductService,
     public dateService: DateConverterService,
     private toastr: ToastrService,
     private router: Router,
-    public loadingService: LoadingService
+    public loadingService: LoadingService,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.deleteProductModal = new window.bootstrap.Modal(
-      document.getElementById('deleteProductModal')
-    );
     this.productService.getAllProducts().subscribe((data: Products[]) => {
       this._PRODUCTS = data;
     });
@@ -82,23 +80,6 @@ export class ProductComponent implements OnInit {
     product.variations.map((data) => (count += data.stocks));
     return count;
   }
-  deleteProduct(data: Products) {
-    this.loadingService.showLoading(data.id);
-    this.productService.deleteProductByID(data.id).subscribe({
-      next: (v) =>
-        this.toastr.error(
-          `${data.name} delete succssfully!`,
-          'Deletion Successful'
-        ),
-      error: (v) => {
-        this.toastr.error(v.message, 'Error Deleting product ');
-      },
-      complete: () => {
-        this.deleteProductModal.hide();
-        this.loadingService.hideLoading(data.id);
-      },
-    });
-  }
 
   viewProduct(product: Products) {
     const navigationExtras: NavigationExtras = {
@@ -106,6 +87,16 @@ export class ProductComponent implements OnInit {
         product: JSON.stringify(product),
       },
     };
-    this.router.navigate(['admin/view-product'], navigationExtras);
+
+    this.router.navigate(
+      [this.authService.users?.type + '/view-product'],
+      navigationExtras
+    );
+  }
+  getUserType() {
+    if (this.authService.users?.type === 'staff') {
+      return 'staff';
+    }
+    return 'admin';
   }
 }

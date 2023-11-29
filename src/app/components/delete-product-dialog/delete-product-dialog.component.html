@@ -65,19 +65,17 @@
           class="btn btn-danger"
           [disabled]="
             confirm !== 'confirm' ||
-            (loadingService.isLoading(product?.id ?? '') | async) === true
+            (loadingService.isLoading('deleting') | async) === true
           "
         >
           <span
-            *ngIf="
-              (loadingService.isLoading(product?.id ?? '') | async) === true
-            "
+            *ngIf="(loadingService.isLoading('deleting') | async) === true"
             class="spinner-border spinner-border-sm me-2"
             role="status"
             aria-hidden="true"
           ></span>
           {{
-            (loadingService.isLoading("login") | async) === true
+            (loadingService.isLoading("deleting") | async) === true
               ? "Deleting..."
               : "Confirm Deletion"
           }}

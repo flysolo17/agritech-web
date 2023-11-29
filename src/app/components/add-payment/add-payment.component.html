@@ -25,11 +25,11 @@
             </h5>
             <h5>
               Total:
-              <b>{{ formatNumber(transaction?.payment?.amount ?? 0) }}</b>
+              <b>{{ formatNumber((transaction?.payment)!.amount || 0) }}</b>
             </h5>
             <h5>
               Cash Recieve:
-              <b>{{ formatNumber(cashReceived.valueAsNumber) }}</b>
+              <b>{{ formatNumber(cashReceived.valueAsNumber || 0) }}</b>
             </h5>
             <h5>
               Change:

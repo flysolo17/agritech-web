@@ -39,6 +39,10 @@ export function formatTimestamp(timestamp: Timestamp): string {
   return date.toLocaleDateString('en-US', options);
 }
 
+export function convertTimestampToDate(timestamp: Timestamp): Date {
+  return timestamp.toDate();
+}
+
 export function getTransactionStatus(number: number): TransactionStatus {
   switch (number) {
     case 0:

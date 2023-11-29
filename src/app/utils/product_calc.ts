@@ -27,14 +27,11 @@ export class ProductCalculator {
     let count = 0;
     const currentYear = new Date().getFullYear();
     this.products.forEach((data) => {
-      const monthYear = data.createdAt.toDate().toLocaleString('default', {
+      const monthYear = data.createdAt.toLocaleString('default', {
         month: 'short',
       });
 
-      if (
-        monthYear === month &&
-        data.createdAt.toDate().getFullYear() === currentYear
-      ) {
+      if (monthYear === month && data.createdAt.getFullYear() === currentYear) {
         if (data.variations.length === 0) {
           count += data.stocks * data.price;
         } else {
@@ -47,8 +44,6 @@ export class ProductCalculator {
     return count;
   }
 
-
-  
   getTotalPurchases() {
     let totalPurchase = 0;
     this.products.map((e) => {
@@ -63,7 +58,6 @@ export class ProductCalculator {
     return totalPurchase;
   }
 
-  
   getTotalSalesValue() {
     let totalSales = 0;
     this.products.map((e) => {
@@ -77,6 +71,4 @@ export class ProductCalculator {
     });
     return totalSales;
   }
-
-
 }

@@ -36,12 +36,17 @@ export class ProductService {
   constructor(private firestore: Firestore, private storage: Storage) {}
   getAllProducts(): Observable<Products[]> {
     return collectionData(
-      collection(this.firestore, this._collection_name)
+      collection(this.firestore, this._collection_name).withConverter(
+        productConverter
+      )
     ) as Observable<Products[]>;
   }
   addProduct(product: Products) {
     return setDoc(
-      doc(collection(this.firestore, this._collection_name), product.id),
+      doc(
+        collection(this.firestore, this._collection_name),
+        product.id
+      ).withConverter(productConverter),
       product
     );
   }
@@ -93,7 +98,10 @@ export class ProductService {
 
   updateProduct(product: Products) {
     return setDoc(
-      doc(collection(this.firestore, this._collection_name), product.id),
+      doc(
+        collection(this.firestore, this._collection_name),
+        product.id
+      ).withConverter(productConverter),
       product
     );
   }
@@ -125,6 +133,21 @@ export class ProductService {
     }
   }
 
+  async uploadsSingleProductImage(productID: string, file: File) {
+    try {
+      const fireRef = ref(
+        this.storage,
+        `${this._collection_name}/${productID}/${uuidv4()}`
+      );
+      await uploadBytes(fireRef, file);
+      const downloadURL = await getDownloadURL(fireRef);
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  }
+
   async uploadVariationImage(productID: string, file: File) {
     try {
       const fireRef = ref(
@@ -140,22 +163,14 @@ export class ProductService {
       throw error;
     }
   }
+
   deleteImage(path: string) {
     const fireRef = ref(this.storage, path);
     return deleteObject(fireRef);
   }
 
-  deleteProductByID(productID: string): Observable<void> {
+  deleteProductByID(productID: string) {
     const folder = ref(this.storage, `${this._collection_name}/${productID}`);
-    // const variationFolder = ref(
-    //   this.storage,
-    //   `${this._collection_name}/${productID}/variation`
-    // );
-    // const variationDelete = listAll(variationFolder).then((data) =>
-    //   data.items.forEach((element) => {
-    //     deleteObject(element);
-    //   })
-    // );
     const storageDelete = listAll(folder).then((data) => {
       data.items.forEach((element) => {
         deleteObject(element);
@@ -164,18 +179,6 @@ export class ProductService {
     const firestoreDelete = deleteDoc(
       doc(collection(this.firestore, this._collection_name), productID)
     );
-    return forkJoin([storageDelete, firestoreDelete]).pipe(
-      switchMap(() => {
-        console.log(
-          'Storage reference and Firestore data deleted successfully.'
-        );
-        return [];
-      }),
-      catchError((error) => {
-        // Handle any combined error here
-        console.error('Combined deletion error:', error);
-        return [];
-      })
-    );
+    return forkJoin([storageDelete, firestoreDelete]);
   }
 }
