@@ -1,0 +1,27 @@
+<div class="container-fluid p-3">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Invoice ID</th>
+        <th scope="col">Cashier</th>
+        <th scope="col">Transaction Type</th>
+        <th scope="col">Order Date</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let transaction of _audits">
+        <th scope="row">{{ transaction.id }}</th>
+        <!-- <td>
+          <div *ngIf="transaction.cashierID !== ''; else noCashier">
+            <app-staff-info [staffID]="transaction.cashierID"></app-staff-info>
+          </div>
+          <ng-template #noCashier> No cashier </ng-template>
+        </td>
+        <td>{{ transaction.type }}</td>
+        <td>{{ transaction.createdAt.toDate().toDateString() }}</td>
+        <td>{{ transaction.status }}</td> -->
+      </tr>
+    </tbody>
+  </table>
+</div>

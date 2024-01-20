@@ -147,21 +147,33 @@
               </form>
 
               <div class="d-flex flex-column gap-3 w-100">
-                <div
-                  class="content-container"
-                  *ngFor="let content of _contentList"
-                >
-                  <img
-                    [src]="content.image"
-                    *ngIf="content.image !== ''"
-                    width="100px"
-                    height="100px"
-                  />
-                  <div class="content">
-                    <h5>{{ content.title }}</h5>
-                    <p>{{ content.description }}</p>
-                  </div>
-                </div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Image</th>
+                      <th scope="col">Title</th>
+                      <th scope="col">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody *ngFor="let content of _contentList">
+                    <tr>
+                      <th>
+                        <img
+                          [src]="content.image"
+                          *ngIf="content.image !== ''"
+                          width="50px"
+                          height="50px"
+                        />
+                      </th>
+                      <td>
+                        <h5>{{ content.title }}</h5>
+                      </td>
+                      <td>
+                        <p>{{ content.description }}</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             <div class="container" style="width: 40%">

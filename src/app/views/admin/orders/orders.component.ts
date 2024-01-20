@@ -18,6 +18,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
 import { TransactionsService } from 'src/app/services/transactions.service';
 import {
+  formatPrice,
   formatTimestamp,
   generateTransactionDetails,
   getTransactionStatus,
@@ -26,6 +27,7 @@ import {
 import { AuditLogService } from 'src/app/services/audit-log.service';
 import { UserType } from 'src/app/models/user-type';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
+import { TransactionCalculator } from 'src/app/utils/transaction_calc';
 declare var window: any;
 declare var window2: any;
 @Component({
@@ -39,6 +41,7 @@ export class OrdersComponent implements OnInit {
   driversDialog: any;
   paymentDialog: any;
   selectedTransaction: Transactions | null = null;
+  transactionCalculator: TransactionCalculator;
   constructor(
     private transactionService: TransactionsService,
     public loadingService: LoadingService,
@@ -48,7 +51,9 @@ export class OrdersComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private auditService: AuditLogService
-  ) {}
+  ) {
+    this.transactionCalculator = new TransactionCalculator([]);
+  }
   ngOnInit(): void {
     this.driversDialog = new window.bootstrap.Modal(
       document.getElementById('driver')
@@ -58,6 +63,9 @@ export class OrdersComponent implements OnInit {
     );
     this.transactionService.getAllOnlineTransactions().subscribe((value) => {
       this._transactionList = value;
+      this.transactionCalculator = new TransactionCalculator(
+        this._transactionList
+      );
       console.log(this._transactionList);
       this.cdr.detectChanges();
     });
@@ -277,8 +285,8 @@ export class OrdersComponent implements OnInit {
         transaction: JSON.stringify(transaction),
       },
     };
-
-    this.router.navigate(['admin/review-transactions'], navigationExtras);
+    let user = this._users?.type == 'staff' ? 'staff' : 'admin';
+    this.router.navigate([user + '/review-transactions'], navigationExtras);
   }
 
   getUserInfo(uid: string) {
@@ -353,5 +361,9 @@ export class OrdersComponent implements OnInit {
         this.selectedTransaction = null;
         this.paymentDialog.hide();
       });
+  }
+
+  formatPHP(num: number) {
+    return formatPrice(num);
   }
 }

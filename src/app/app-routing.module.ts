@@ -23,6 +23,8 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { ViewAuditComponent } from './views/admin/view-audit/view-audit.component';
 import { ViewProductComponent } from './views/inventory/view-product/view-product.component';
 import { EditProductComponent } from './views/inventory/edit-product/edit-product.component';
+import { MessagesComponent } from './views/messages/messages.component';
+import { ViewCustomerProfileComponent } from './views/admin/view-customer-profile/view-customer-profile.component';
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'notfound', component: NotFoundComponent },
@@ -37,7 +39,9 @@ const routes: Routes = [
       { path: 'view-product', component: ViewProductComponent },
       { path: 'reports', component: ReportsComponent },
       { path: 'customer', component: CustomerComponent },
+      { path: 'view-profile', component: ViewCustomerProfileComponent },
       { path: 'orders', component: OrdersComponent },
+      { path: 'messages', component: MessagesComponent },
       {
         path: 'review-transactions',
         component: ReviewTransactionComponent,
@@ -65,23 +69,26 @@ const routes: Routes = [
       { path: 'edit-product', component: EditProductComponent },
       { path: 'view-product', component: ViewProductComponent },
       { path: 'orders', component: OrdersComponent },
+      { path: 'messages', component: MessagesComponent },
       {
         path: 'review-transactions',
         component: ReviewTransactionComponent,
       },
-      {
-        path: 'transactions',
-        component: TransactionsComponent,
-      },
     ],
   },
-
+  {
+    path: 'staff/transactions/:users',
+    component: TransactionsComponent,
+  },
+  {
+    path: 'messages',
+    component: MessagesComponent,
+  },
   {
     path: 'profile',
     component: ProfileComponent,
   },
   { path: 'login', component: LoginComponent },
-
 ];
 
 @NgModule({

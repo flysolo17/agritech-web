@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
   styleUrls: ['./add-variation.component.css'],
 })
 export class AddVariationComponent {
+  @Input() variations: Variation[] = [];
   @Input() productID!: string;
   @Output() onSubmit = new EventEmitter<Variation>();
   selectedFile: File | null = null;
@@ -32,8 +33,20 @@ export class AddVariationComponent {
   }
 
   submitForm() {
+    let varName = this.variationForm.controls.name.value ?? '';
+    var isVariationPresent = false;
+    this.variations.forEach((element) => {
+      if (varName.toLocaleLowerCase() === element.name.toLocaleLowerCase()) {
+        isVariationPresent = true;
+      }
+    });
+    if (isVariationPresent) {
+      this.toastr.warning('Variation already exists!');
+      return;
+    }
     if (this.variationForm.valid) {
       this.loadingService.showLoading('add-variation');
+
       let variation: Variation = {
         id: uuidv4(),
         image: '',

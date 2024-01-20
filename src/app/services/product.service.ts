@@ -96,6 +96,25 @@ export class ProductService {
     return docData(productDocRef, { idField: productID });
   }
 
+  addToFeaturedProduct(productID: string) {
+    const product = doc(
+      collection(this.firestore, this._collection_name),
+      productID
+    );
+    return updateDoc(product, {
+      featured: true,
+    });
+  }
+
+  removeFromFeaturedProduct(productID: string) {
+    const product = doc(
+      collection(this.firestore, this._collection_name),
+      productID
+    );
+    return updateDoc(product, {
+      featured: false,
+    });
+  }
   updateProduct(product: Products) {
     return setDoc(
       doc(

@@ -12,7 +12,7 @@ export class TransactionCalculator {
   constructor(transactions: Transactions[]) {
     this.transactions = transactions;
   }
-  
+
   calculateTotalSales(): number {
     let totalSales = 0;
     for (const transaction of this.transactions.filter(
@@ -37,8 +37,6 @@ export class TransactionCalculator {
     return totalCost;
   }
 
-
-
   calculateTopSellingStocks(): TopSellingStock[] {
     const orderList: OrderItems[] = this.transactions
       .filter((e) => e.status == TransactionStatus.COMPLETED)
@@ -61,9 +59,6 @@ export class TransactionCalculator {
         });
       }
     }
-
-
-
 
     const topSellingStocks: TopSellingStock[] = Array.from(
       topSellingStockMap.values()
@@ -102,8 +97,6 @@ export class TransactionCalculator {
     return totalSalesPerMonth;
   }
 
-
-  
   calculateTotalCostPerMonth(): Map<string, number> {
     const totalSalesPerMonth = new Map<string, number>();
     const currentYear = new Date().getFullYear();
@@ -230,7 +223,6 @@ export class TransactionCalculator {
     return uniqueCustomerIDs.size;
   }
 
-
   countCancelledTransactions() {
     return this.transactions.filter(
       (e) => e.status == TransactionStatus.CANCELLED
@@ -267,7 +259,78 @@ export class TransactionCalculator {
     return categorySalesArray;
   }
 
+  countTotalTransactionsLast7Days(): number {
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
 
+    return this.transactions.filter(
+      (transaction) =>
+        transaction.status === TransactionStatus.COMPLETED &&
+        transaction.createdAt.toDate() >= sevenDaysAgo &&
+        transaction.createdAt.toDate() <= currentDate
+    ).length;
+  }
+  countCompletedTransactionsLast7Days(): number {
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+
+    return this.transactions.filter(
+      (transaction) =>
+        transaction.status === TransactionStatus.COMPLETED &&
+        transaction.createdAt.toDate() >= sevenDaysAgo &&
+        transaction.createdAt.toDate() <= currentDate
+    ).length;
+  }
+  sumTotalSalesCompleted7DaysAgo(): number {
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+
+    return this.transactions
+      .filter(
+        (transaction) =>
+          transaction.status === TransactionStatus.COMPLETED &&
+          transaction.createdAt.toDate() >= sevenDaysAgo &&
+          transaction.createdAt.toDate() < currentDate
+      )
+      .reduce((totalSales, transaction) => {
+        const salesForTransaction = transaction.orderList.reduce(
+          (subtotal, orderItem) =>
+            subtotal + orderItem.quantity * orderItem.price,
+          0
+        );
+        return totalSales + salesForTransaction;
+      }, 0);
+  }
+
+  countAndSumFailedOrders7DaysAgo(): { count: number; totalAmount: number } {
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+
+    const failedOrders = this.transactions.filter(
+      (transaction) =>
+        transaction.status === TransactionStatus.FAILED &&
+        transaction.createdAt.toDate() >= sevenDaysAgo &&
+        transaction.createdAt.toDate() < currentDate
+    );
+
+    const count = failedOrders.length;
+    const totalAmount = failedOrders.reduce((total, transaction) => {
+      return (
+        total +
+        transaction.orderList.reduce(
+          (subtotal, orderItem) =>
+            subtotal + orderItem.quantity * orderItem.price,
+          0
+        )
+      );
+    }, 0);
+
+    return { count, totalAmount };
+  }
 
   // // more efficient
   // calculateTotalSalesAndCostPerMonth(): [

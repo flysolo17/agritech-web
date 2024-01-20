@@ -11,6 +11,8 @@ import { DateConverterService } from 'src/app/services/date-converter.service';
 import { LoadingService } from 'src/app/services/loading.service';
 
 import { ProductService } from 'src/app/services/product.service';
+import { formatPrice } from 'src/app/utils/constants';
+import { ProductCalculator } from 'src/app/utils/product_calc';
 
 @Component({
   selector: 'app-product',
@@ -22,7 +24,7 @@ export class ProductComponent implements OnInit {
 
   _selectedProduct: Products | null = null;
   _PRODUCTS: Products[] = [];
-
+  productCalculator: ProductCalculator;
   constructor(
     private productService: ProductService,
     public dateService: DateConverterService,
@@ -30,11 +32,14 @@ export class ProductComponent implements OnInit {
     private router: Router,
     public loadingService: LoadingService,
     public authService: AuthService
-  ) {}
+  ) {
+    this.productCalculator = new ProductCalculator([]);
+  }
 
   ngOnInit(): void {
     this.productService.getAllProducts().subscribe((data: Products[]) => {
       this._PRODUCTS = data;
+      this.productCalculator = new ProductCalculator(this._PRODUCTS);
     });
   }
 
@@ -92,6 +97,10 @@ export class ProductComponent implements OnInit {
       [this.authService.users?.type + '/view-product'],
       navigationExtras
     );
+  }
+
+  formatPHP(num: number) {
+    return formatPrice(num);
   }
   getUserType() {
     if (this.authService.users?.type === 'staff') {

@@ -24,7 +24,24 @@
           </svg>
           EDIT
         </button>
-        <button class="btn btn-outline-secondary">RE STOCK</button>
+
+        <div>
+          <button
+            *ngIf="_product?.featured == false"
+            class="btn btn-outline-success"
+            (click)="addToFeaturedProduct(_product!.id)"
+          >
+            ADD TO FEATURE PRODUCT
+          </button>
+
+          <button
+            *ngIf="_product?.featured == true"
+            class="btn btn-outline-danger"
+            (click)="removeFromFeaturedProduct(_product!.id)"
+          >
+            REMOVE FROM FEATURE PRODUCT
+          </button>
+        </div>
       </div>
     </div>
     <!-- TABS -->
@@ -76,7 +93,9 @@
         aria-labelledby="nav-overview-tab"
         tabindex="0"
       >
-        ...
+        <div *ngIf="_product !== null">
+          <app-product-overview [product]="_product"></app-product-overview>
+        </div>
       </div>
       <div
         class="tab-pane fade"
@@ -85,7 +104,9 @@
         aria-labelledby="nav-purchases-tab"
         tabindex="0"
       >
-        ...
+        <div *ngIf="_product !== null">
+          <app-product-purchases [product]="_product"></app-product-purchases>
+        </div>
       </div>
       <div
         class="tab-pane fade"
@@ -94,16 +115,11 @@
         aria-labelledby="nav-adjustments-tab"
         tabindex="0"
       >
-        ...
-      </div>
-      <div
-        class="tab-pane fade"
-        id="nav-disabled"
-        role="tabpanel"
-        aria-labelledby="nav-disabled-tab"
-        tabindex="0"
-      >
-        ...
+        <div *ngIf="_product !== null">
+          <app-product-adjustments
+            [product]="_product"
+          ></app-product-adjustments>
+        </div>
       </div>
     </div>
   </div>

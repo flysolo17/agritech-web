@@ -89,4 +89,32 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
       navigationExtras
     );
   }
+
+  addToFeaturedProduct(productID: string) {
+    this.productService
+      .addToFeaturedProduct(productID)
+      .then(() => {
+        this.toastr.success('Successfully Added!');
+      })
+      .catch((err) => {
+        this.toastr.error(err.toString());
+      })
+      .finally(() => {
+        this._product!.featured = true;
+      });
+  }
+
+  removeFromFeaturedProduct(productID: string) {
+    this.productService
+      .removeFromFeaturedProduct(productID)
+      .then(() => {
+        this.toastr.success('Successfully removed!');
+      })
+      .catch((err) => {
+        this.toastr.error(err.toString());
+      })
+      .finally(() => {
+        this._product!.featured = false;
+      });
+  }
 }

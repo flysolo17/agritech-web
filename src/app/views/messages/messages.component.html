@@ -1,0 +1,29 @@
+<div class="container-fluid h-100 overflow-hidden">
+  <div class="d-flex h-100">
+    <div class="m-container m-container-1">
+      <div
+        class="messages-list overflow-auto w-100"
+        *ngFor="let message of $messages"
+      >
+        <div class="customer-message">
+          <img
+            src="../../../assets/images/profile_placeholder.jpg"
+            class="profile"
+            alt="Profile Image"
+          />
+          <div class="flex-grow-1 p-1">
+            <h6 class="fw-bold">Juan Dela Cruz</h6>
+            <p>{{ message.message }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="m-container m-container-2">
+      <p *ngIf="selectedConvo === null">No Conversation Selected!</p>
+
+      <div class="convo-container" *ngIf="selectedConvo !== null">
+        <app-conversation></app-conversation>
+      </div>
+    </div>
+  </div>
+</div>

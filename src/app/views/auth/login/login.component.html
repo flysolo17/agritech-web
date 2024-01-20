@@ -35,7 +35,6 @@
           [ngClass]="
             loginForm.get('password')?.invalid ? 'is-invalid' : 'form-control'
           "
-          placeholder="name@example.com"
         />
         <label for="floatingInput">Password</label>
         <div
@@ -48,9 +47,7 @@
           Password must be at least 6 characters long.
         </div>
       </div>
-      <button class="btn text-dark fw-normal mb-3" type="button">
-        Forgot Password
-      </button>
+      <app-forgot-password></app-forgot-password>
       <button
         class="btn btn-danger btn-lg w-100"
         type="submit"

@@ -30,13 +30,16 @@
             </h5>
             <h5>
               Cash Recieve:
-              <b>{{ formatNumber(cashReceived.valueAsNumber) }}</b>
+              <b>{{ formatNumber(cashReceived.valueAsNumber || 0) }}</b>
             </h5>
             <h5>
               Change:
               <b>{{
                 formatNumber(
-                  computeChange(subtotal(orders), cashReceived.valueAsNumber)
+                  computeChange(
+                    subtotal(orders),
+                    cashReceived.valueAsNumber || 0
+                  )
                 )
               }}</b>
             </h5>

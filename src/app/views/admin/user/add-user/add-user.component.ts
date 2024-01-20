@@ -49,10 +49,10 @@ export class AddUserComponent {
           id: user.uid,
           name: this.userForm.controls.name.value ?? '',
           profile: '',
-          phone: this.userForm.controls.phone.value ?? '',
+          phone: this.userForm.controls.phone.value?.toString() ?? '',
           email: user.email ?? '',
           address: this.userForm.controls.address.value ?? '',
-          type: userType === 'staff' ? UserType.STAFF : UserType.ADMIN,
+          type: userType === 'staff' ? UserType.STAFF : UserType.DRIVER,
         };
         this.saveAccount(users);
       })

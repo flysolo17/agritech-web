@@ -1,4 +1,5 @@
 import { QueryDocumentSnapshot } from '@angular/fire/firestore';
+import { CustomerAddress } from './addresses';
 
 export interface Customers {
   id: string;
@@ -6,7 +7,7 @@ export interface Customers {
   phone: string;
   profile: string;
   createdAt: Date;
-  address: [];
+  addresses: CustomerAddress[];
 }
 export const customerConverter = {
   toFirestore: (data: Customers) => data,

@@ -50,6 +50,15 @@ import { ViewAuditComponent } from './views/admin/view-audit/view-audit.componen
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { EditProductComponent } from './views/inventory/edit-product/edit-product.component';
 import { AddStocksComponent } from './views/inventory/add-stocks/add-stocks.component';
+import { ProductOverviewComponent } from './views/inventory/product-overview/product-overview.component';
+import { ProductPurchasesComponent } from './views/inventory/product-purchases/product-purchases.component';
+import { ProductAdjustmentsComponent } from './views/inventory/product-adjustments/product-adjustments.component';
+import { MessagesComponent } from './views/messages/messages.component';
+
+import { ConversationComponent } from './components/conversation/conversation.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { EditCmsComponent } from './components/edit-cms/edit-cms.component';
+import { ViewCustomerProfileComponent } from './views/admin/view-customer-profile/view-customer-profile.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -88,6 +97,15 @@ import { AddStocksComponent } from './views/inventory/add-stocks/add-stocks.comp
     ViewAuditComponent,
     EditProductComponent,
     AddStocksComponent,
+    ProductOverviewComponent,
+    ProductPurchasesComponent,
+    ProductAdjustmentsComponent,
+    MessagesComponent,
+
+    ConversationComponent,
+    ForgotPasswordComponent,
+    EditCmsComponent,
+    ViewCustomerProfileComponent,
   ],
   imports: [
     BrowserAnimationsModule,

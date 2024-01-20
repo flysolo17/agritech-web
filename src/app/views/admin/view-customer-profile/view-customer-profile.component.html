@@ -1,0 +1,80 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    <div class="col-4 h-100">
+      <div class="box bg-white">
+        <div class="d-flex flex-column align-items-center gap-2">
+          <img
+            [src]="customer$?.profile"
+            class="rounded-circle"
+            width="150px"
+            height="150px"
+          />
+          <h5>{{ customer$?.name }}</h5>
+          <span>{{ customer$?.phone }}</span>
+          <div class="row text-center p-3">
+            <div class="col-4">
+              <h5>
+                {{ countPending() }}
+              </h5>
+              <h6>Pending</h6>
+            </div>
+            <div class="col-4">
+              <h5>
+                {{ countOngoing() }}
+              </h5>
+              <h6>Ongoing</h6>
+            </div>
+            <div class="col-4">
+              <h5>
+                {{ countCompleted() }}
+              </h5>
+              <h6>Completed</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8 h-100">
+      <div class="box bg-white overflow-auto">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">ORDER DETAILS</th>
+
+              <th scope="col">ORDER VALUE</th>
+              <th scope="col">IS ORDER PAID?</th>
+              <th scope="col">ORDER DATE</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let transactions of transactions$">
+            <tr>
+              <td>
+                <div class="d-flex flex-column gap-1">
+                  <h6>ORDER ID : {{ transactions.id }}</h6>
+                  <h6 class="text-success">{{ transactions.type }}</h6>
+                </div>
+              </td>
+
+              <td>
+                <div>
+                  <p>
+                    <b>
+                      {{ transactions.payment.amount.toLocaleString('en-US', {
+                          style: 'currency',
+                          currency: 'PHP',
+                        })}}
+                    </b>
+
+                    - {{ transactions.payment.type }}
+                  </p>
+                </div>
+              </td>
+              <td>{{ transactions.payment.status }}</td>
+              <td>{{ convertTimestamp(transactions.createdAt) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

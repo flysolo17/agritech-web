@@ -1,0 +1,74 @@
+<div class="container-fluid p-3">
+  <div class="row">
+    <div class="col-6">
+      <h5>Primary Details</h5>
+      <div class="details">
+        <p class="text-secondary">Product ID</p>
+        <p class="text-secondary">{{ product.id }}</p>
+      </div>
+      <div class="details">
+        <p class="text-secondary">Product name</p>
+        <p class="text-secondary">{{ product.name }}</p>
+      </div>
+      <div class="details">
+        <p class="text-secondary">Category</p>
+        <p class="text-secondary">{{ product.category }}</p>
+      </div>
+      <div class="details">
+        <p class="text-secondary">Expiration Date</p>
+        <p class="text-secondary">
+          {{ formatTimestamp(product.expiryDate) }}
+        </p>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="d-flex flex-column align-items-center justify-content-end">
+        <div class="image-box">
+          <img [src]="product.images[0]" width="150px" height="150px" />
+        </div>
+        <div class="details">
+          <p class="text-secondary">Stocks</p>
+          <p class="text-secondary">
+            {{ product.cost }}
+          </p>
+        </div>
+
+        <div class="details">
+          <p class="text-secondary">Price</p>
+          <p class="text-secondary">
+            {{ formatPrice(product) }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <h5>Variations</h5>
+      <table class="table">
+        <thead class="bg-light">
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Stocks</th>
+            <th scope="col">Cost</th>
+            <th scope="col">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let variations of product.variations">
+            <td>{{ variations.name }}</td>
+            <td>{{ variations.stocks }}</td>
+            <td>{{ variations.cost }}</td>
+            <td>{{ variations.price }}</td>
+          </tr>
+          <tr
+            *ngIf="product.variations.length == 0"
+            class="border-0 text-center"
+          >
+            <td colspan="5 r">
+              <p class="text-center">No Variations</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -16,7 +16,7 @@
           />
         </svg>
       </button>
-      <h5>New Product</h5>
+      <h5>Update Product</h5>
     </div>
     <div class="container-fluid p-3 flex-grow-1 rounded-2 d-flex flex-column">
       <div class="d-flex gap-2">
@@ -358,4 +358,5 @@
 <app-add-variation
   (onSubmit)="saveVariation($event)"
   [productID]="product?.id ?? ''"
+  [variations]="variationList$"
 ></app-add-variation>

@@ -6,7 +6,9 @@
         <div class="col">
           <h6 class="text-primary">Total Orders</h6>
           <div class="row">
-            <p class="fw-bold">14</p>
+            <p class="fw-bold">
+              {{ transactionCalculator.countTotalTransactionsLast7Days() }}
+            </p>
             <p class="text-secondary">Last 7 days</p>
           </div>
         </div>
@@ -14,11 +16,21 @@
           <h6 class="text-warning">Total Received</h6>
           <div class="row">
             <div class="col text-start">
-              <p class="fw-bold">14</p>
+              <p class="fw-bold">
+                {{
+                  transactionCalculator.countCompletedTransactionsLast7Days()
+                }}
+              </p>
               <p class="text-secondary">Last 7 days</p>
             </div>
             <div class="col text-end">
-              <p class="fw-bold">14</p>
+              <p class="fw-bold">
+                {{
+                  formatPHP(
+                    transactionCalculator.sumTotalSalesCompleted7DaysAgo()
+                  )
+                }}
+              </p>
               <p class="text-secondary">Last 7 days</p>
             </div>
           </div>
@@ -27,24 +39,22 @@
           <h6 style="color: blueviolet">Top Failed</h6>
           <div class="row">
             <div class="col text-start">
-              <p class="fw-bold">14</p>
+              <p class="fw-bold">
+                {{
+                  transactionCalculator.countAndSumFailedOrders7DaysAgo().count
+                }}
+              </p>
               <p class="text-secondary">Last 7 days</p>
             </div>
             <div class="col text-end">
-              <p class="fw-bold">14</p>
-              <p class="text-secondary">Last 7 days</p>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <h6 class="text-danger">On The way</h6>
-          <div class="row">
-            <div class="col text-start">
-              <p class="fw-bold">14</p>
-              <p class="text-secondary">Last 7 days</p>
-            </div>
-            <div class="col text-end">
-              <p class="fw-bold">14</p>
+              <p class="fw-bold">
+                {{
+                  formatPHP(
+                    transactionCalculator.countAndSumFailedOrders7DaysAgo()
+                      .totalAmount
+                  )
+                }}
+              </p>
               <p class="text-secondary">Last 7 days</p>
             </div>
           </div>

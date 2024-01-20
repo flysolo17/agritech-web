@@ -120,6 +120,9 @@ export function generateTransactionDetails(status: TransactionStatus) {
 }
 
 import { Order, Products } from 'src/app/models/products';
+import { Messages } from '../models/messages';
+import { Address } from '../models/user_address';
+import { CustomerAddress } from '../models/addresses';
 
 export function formatPrice(value: number): string {
   return value.toLocaleString('en-us', {
@@ -181,3 +184,61 @@ export const months = [
   'Nov',
   'Dec',
 ];
+
+export function removeDuplicateMessages(messages: Messages[]): Messages[] {
+  const uniqueIds = new Set<string>();
+  const uniqueMessages: Messages[] = [];
+
+  for (const message of messages) {
+    if (!uniqueIds.has(message.id)) {
+      uniqueIds.add(message.id);
+      uniqueMessages.push(message);
+    }
+  }
+  return uniqueMessages;
+}
+
+export function formatTimeDifference(timestamp: Timestamp): string {
+  const now = new Date();
+  const dateTime = timestamp.toDate(); // Convert Firestore Timestamp to Date
+  const difference = Math.abs(now.getTime() - dateTime.getTime());
+
+  const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(
+    (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  );
+  const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (days > 365) {
+    const years = Math.floor(days / 365);
+    return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+  } else if (days >= 30) {
+    const months = Math.floor(days / 30);
+    return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+  } else if (days >= 7) {
+    const weeks = Math.floor(days / 7);
+    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+  } else if (days > 0) {
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  } else if (hours > 0) {
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+  } else {
+    return 'just now';
+  }
+}
+
+export function getFormattedLocation(address: CustomerAddress) {
+  return `${address.barangay}, ${address.city}, ${address.province}, ${address.region} |  ${address.postalCode}`;
+}
+
+export function getDefaultAddress(
+  userAddresses: CustomerAddress[]
+): CustomerAddress | null {
+  const defaultAddress = userAddresses.find((address) => {
+    address.isDefault;
+  });
+
+  return defaultAddress ?? null;
+}

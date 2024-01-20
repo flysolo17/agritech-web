@@ -23,6 +23,7 @@ declare var window: any;
   styleUrls: ['./edit-product.component.css'],
 })
 export class EditProductComponent implements OnInit {
+  _default: Products | null = null;
   product: Products | null = null;
   createVariationModal: any;
   _imageURL: string[] = [];
@@ -60,7 +61,14 @@ export class EditProductComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe((params) => {
       const products = params['product'];
       this.product = JSON.parse(products);
+      this._default = JSON.parse(products);
+      if (this._default) {
+        const created = new Date(this._default.createdAt);
+        this._default.createdAt = created;
 
+        const dateObject = new Date(this._default.expiryDate);
+        this._default.expiryDate = dateObject;
+      }
       if (this.product) {
         const dateObject = new Date(this.product.createdAt);
         this.product.createdAt = dateObject;
@@ -168,13 +176,14 @@ export class EditProductComponent implements OnInit {
     this.productService
       .updateProduct(product)
       .then(async (data) => {
+        console.log(this._default);
         await this.auditService.saveAudit({
           id: '',
           email: this.authService.users?.email || '',
           role: this.authService.users?.type || UserType.ADMIN,
           action: ActionType.UPDATE,
           component: ComponentType.INVENTORY,
-          payload: product,
+          payload: this._default,
           details: 'updating product',
           timestamp: Timestamp.now(),
         });

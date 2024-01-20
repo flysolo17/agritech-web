@@ -37,4 +37,13 @@ export class AuditLogService {
     );
     return collectionData(q) as Observable<Audit[]>;
   }
+  getProductAdjustMents(id: string) {
+    const q = query(
+      collection(this.firestore, AUDIT_TABLE),
+      where('component', '==', 'INVENTORY'),
+      where('payload.id', '==', id),
+      orderBy('timestamp', 'desc')
+    );
+    return collectionData(q) as Observable<Audit[]>;
+  }
 }

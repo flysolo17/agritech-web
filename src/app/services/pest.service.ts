@@ -13,6 +13,7 @@ import { PestMap, Topic } from '../models/pest';
 import {
   Firestore,
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
   doc,
@@ -54,6 +55,12 @@ export class PestService {
   addPestMapTopic(pestID: string, topic: Topic) {
     return updateDoc(doc(this.firestore, this._collection_name, pestID), {
       topic: arrayUnion(topic),
+    });
+  }
+
+  deleteTopic(pestID: string, topic: Topic) {
+    return updateDoc(doc(this.firestore, this._collection_name, pestID), {
+      topic: arrayRemove(topic),
     });
   }
 }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Users } from './models/users';
 import { user } from 'rxfire/auth';
 import { AuditLogService } from './services/audit-log.service';
+import { MessagesService } from './services/messages.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ export class AppComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private messagesService: MessagesService,
     private auditLogService: AuditLogService
   ) {}
   ngOnInit(): void {

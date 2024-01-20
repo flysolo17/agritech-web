@@ -20,6 +20,7 @@
               <div
                 class="card material-card"
                 *ngFor="let topic of data.topic"
+                (click)="updateTopic(data.id, topic)"
                 style="margin-bottom: 10px"
               >
                 <img
@@ -140,3 +141,8 @@
   [pestID]="_selectedPest ?? ''"
   (pestEvent)="topicModal.hide()"
 ></app-add-topic>
+
+<app-edit-cms
+  [pestID]="_selectedPest ?? ''"
+  [topic]="selectedTopic"
+></app-edit-cms>

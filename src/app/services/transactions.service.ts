@@ -24,6 +24,8 @@ import * as dayjs from 'dayjs';
 import { TransactionType } from '../models/transaction/transaction_type';
 import { v4 as uuidv4 } from 'uuid';
 import { generateInvoiceID } from '../utils/constants';
+import { docData } from 'rxfire/firestore';
+import { OrderItems } from '../models/transaction/order_items';
 @Injectable({
   providedIn: 'root',
 })
@@ -47,7 +49,14 @@ export class TransactionsService {
     );
     return collectionData(q) as Observable<Transactions[]>;
   }
-
+  getPendingOrders(): Observable<Transactions[]> {
+    const q = query(
+      collection(this.firestore, this._collection_name),
+      where('status', '==', TransactionStatus.PENDING),
+      orderBy('createdAt', 'asc')
+    );
+    return collectionData(q) as Observable<Transactions[]>;
+  }
   updateTransactionStatus(
     transactionID: string,
     status: TransactionStatus,
@@ -68,6 +77,14 @@ export class TransactionsService {
     return updateDoc(transactionRef, updatedData);
   }
 
+  getTransactionByCustomerID(customerID: string): Observable<Transactions[]> {
+    const q = query(
+      collection(this.firestore, this._collection_name),
+      where('customerID', '==', customerID),
+      orderBy('createdAt', 'desc')
+    );
+    return collectionData(q) as Observable<Transactions[]>;
+  }
   createTransaction(transaction: Transactions) {
     transaction.id = generateInvoiceID();
     return setDoc(
@@ -101,6 +118,20 @@ export class TransactionsService {
       }
     );
   }
+
+  getTransactionsByProductID(productID: string): Observable<Transactions[]> {
+    let obj = {
+      productID: productID,
+    };
+    const q = query(
+      collection(this.firestore, this._collection_name),
+      where('orderList', 'array-contains', obj),
+      orderBy('createdAt', 'desc'),
+      orderBy('updatedAt', 'desc')
+    );
+    return collectionData(q) as Observable<Transactions[]>;
+  }
+
   // getTransactionByDate(
   //   startDate: Date,
   //   endDate: Date

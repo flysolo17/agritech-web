@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, getDoc } from '@angular/fire/firestore';
+import {
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  getDoc,
+} from '@angular/fire/firestore';
 
-import { customerConverter } from '../models/customers';
+import { Customers, customerConverter } from '../models/customers';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,5 +24,10 @@ export class CustomerService {
         customerID
       ).withConverter(customerConverter)
     );
+  }
+  getAllCustomer(): Observable<Customers[]> {
+    return collectionData(
+      collection(this.firestore, 'customers')
+    ) as Observable<Customers[]>;
   }
 }
