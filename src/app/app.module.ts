@@ -59,6 +59,7 @@ import { ConversationComponent } from './components/conversation/conversation.co
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { EditCmsComponent } from './components/edit-cms/edit-cms.component';
 import { ViewCustomerProfileComponent } from './views/admin/view-customer-profile/view-customer-profile.component';
+import { SettingsComponent } from './views/admin/settings/settings.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -106,6 +107,7 @@ import { ViewCustomerProfileComponent } from './views/admin/view-customer-profil
     ForgotPasswordComponent,
     EditCmsComponent,
     ViewCustomerProfileComponent,
+    SettingsComponent,
   ],
   imports: [
     BrowserAnimationsModule,

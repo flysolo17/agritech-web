@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable, Subscription } from 'rxjs';
 
 import { Products } from 'src/app/models/products';
+import { Users } from 'src/app/models/users';
 import { Variation } from 'src/app/models/variation';
 import { AuthService } from 'src/app/services/auth.service';
 import { DateConverterService } from 'src/app/services/date-converter.service';
@@ -25,6 +26,7 @@ export class ProductComponent implements OnInit {
   _selectedProduct: Products | null = null;
   _PRODUCTS: Products[] = [];
   productCalculator: ProductCalculator;
+  users$: Users | null = null;
   constructor(
     private productService: ProductService,
     public dateService: DateConverterService,
@@ -34,6 +36,9 @@ export class ProductComponent implements OnInit {
     public authService: AuthService
   ) {
     this.productCalculator = new ProductCalculator([]);
+    authService.users$.subscribe((data) => {
+      this.users$ = data;
+    });
   }
 
   ngOnInit(): void {
@@ -94,7 +99,7 @@ export class ProductComponent implements OnInit {
     };
 
     this.router.navigate(
-      [this.authService.users?.type + '/view-product'],
+      [this.users$?.type + '/view-product'],
       navigationExtras
     );
   }
@@ -103,7 +108,7 @@ export class ProductComponent implements OnInit {
     return formatPrice(num);
   }
   getUserType() {
-    if (this.authService.users?.type === 'staff') {
+    if (this.users$?.type === 'staff') {
       return 'staff';
     }
     return 'admin';

@@ -21,7 +21,7 @@
     />
   </div>
   <div class="d-flex gap-3 align-items-center">
-    <button
+    <!-- <button
       type="button"
       class="btn btn-outline-secondary position-relative"
       routerLink="/messages"
@@ -39,19 +39,21 @@
         />
       </svg>
 
-      <span
-        *ngIf="newMessages !== 0"
-        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-      >
-        {{ newMessages }}
-        <span class="visually-hidden">unread messages</span>
-      </span>
-    </button>
+    </button> -->
+
     <img
-      src="../../../assets/images/profile.jpg"
-      alt="Profile Image"
       class="img-fluid rounded-circle"
+      *ngIf="users$?.profile !== ''; else placeholder"
+      [src]="users$?.profile"
       style="height: 40px; width: 40px"
     />
+    <ng-template #placeholder>
+      <img
+        class="img-fluid rounded-circle"
+        src="../../../../assets/images/profile_placeholder.jpg"
+        alt="Placeholder"
+        style="height: 40px; width: 40px"
+      />
+    </ng-template>
   </div>
 </div>

@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Products } from 'src/app/models/products';
 import { UserType } from 'src/app/models/user-type';
+import { Users } from 'src/app/models/users';
 import { AuditLogService } from 'src/app/services/audit-log.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
@@ -25,6 +26,7 @@ declare var window: any;
 export class ViewProductComponent implements OnInit, AfterViewInit {
   _product: Products | null = null;
   deleteProductModal: any;
+  users$: Users | null = null;
   constructor(
     private activatedRoute: ActivatedRoute,
     private productService: ProductService,
@@ -35,7 +37,11 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
     private router: Router,
     private auditLogService: AuditLogService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    authService.users$.subscribe((data) => {
+      this.users$ = data;
+    });
+  }
   ngAfterViewInit(): void {
     this.deleteProductModal = new window.bootstrap.Modal(
       document.getElementById('deleteProductModal')
@@ -56,8 +62,8 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
       next: async (v) => {
         await this.auditLogService.saveAudit({
           id: '',
-          email: this.authService.users?.email ?? 'no email',
-          role: this.authService.users?.type ?? UserType.ADMIN,
+          email: this.users$?.email ?? 'no email',
+          role: this.users$?.type ?? UserType.ADMIN,
           action: ActionType.DELETE,
           component: ComponentType.INVENTORY,
           payload: data,
@@ -85,7 +91,7 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
       },
     };
     this.router.navigate(
-      [this.authService.users?.type + '/edit-product'],
+      [this.users$?.type + '/edit-product'],
       navigationExtras
     );
   }

@@ -233,10 +233,7 @@
       </ul>
     </div>
     <div class="overflow-auto d-flex flex-column w-100" style="width: 85%">
-      <app-header
-        [users]="users$"
-        [newMessages]="$messages.length"
-      ></app-header>
+      <app-header></app-header>
       <div class="flex-grow-1">
         <router-outlet></router-outlet>
       </div>

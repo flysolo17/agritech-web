@@ -35,7 +35,7 @@ export class CustomerComponent implements OnInit, OnDestroy {
       .getAllCustomer()
       .subscribe((customers) => {
         this.$customers = customers;
-        console.log(customers);
+
         this.cdr.detectChanges();
       });
   }
@@ -45,7 +45,6 @@ export class CustomerComponent implements OnInit, OnDestroy {
 
   getDefaultAddressFormattedLocation(addressList: CustomerAddress[]): string {
     const defaultAddress = addressList.find((e) => e.isDefault) || null;
-    console.log('ADDRESSES : ', defaultAddress);
     if (defaultAddress !== null) {
       return getFormattedLocation(defaultAddress);
     }
@@ -53,6 +52,7 @@ export class CustomerComponent implements OnInit, OnDestroy {
   }
 
   viewProfile(customer: Customers) {
+    console.log(customer);
     this.router.navigate(['/admin/view-profile'], {
       queryParams: customer,
     });

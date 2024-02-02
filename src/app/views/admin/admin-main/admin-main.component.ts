@@ -8,6 +8,7 @@ import {
 import { Auth, User, user } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
 import { Messages } from 'src/app/models/messages';
+import { TransactionStatus } from 'src/app/models/transaction/transaction_status';
 import { Transactions } from 'src/app/models/transaction/transactions';
 import { Users } from 'src/app/models/users';
 import { AuthService } from 'src/app/services/auth.service';
@@ -20,15 +21,12 @@ import { removeDuplicateMessages } from 'src/app/utils/constants';
   templateUrl: './admin-main.component.html',
   styleUrls: ['./admin-main.component.css'],
 })
-export class AdminMainComponent implements OnInit, OnDestroy {
-  private subscription: Subscription;
-  auth: Auth = inject(Auth);
+export class AdminMainComponent implements OnInit {
+  users$: Users | null = null;
 
-  user$ = user(this.auth);
-  users$: Users | null;
   $messages: Messages[] = [];
-  userSubscription: Subscription;
   transactionSubscription: Subscription;
+
   $transactions: Transactions[] = [];
   constructor(
     private authService: AuthService,
@@ -37,39 +35,44 @@ export class AdminMainComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {
     this.transactionSubscription = new Subscription();
-    this.users$ = authService.users;
-    this.subscription = new Subscription();
-    this.userSubscription = new Subscription();
-  }
-
-  ngOnInit(): void {
-    this.transactionSubscription = this.transactionService
-      .getPendingOrders()
+    this.transactionSubscription = transactionService
+      .getAllTransactions()
       .subscribe((data) => {
-        this.$transactions = data;
+        this.$transactions = data.filter(
+          (e) => e.status === TransactionStatus.PENDING
+        );
+        transactionService.setTransactions(data);
       });
-    this.userSubscription = this.user$.subscribe((user: User | null) => {
-      if (user != null) {
-        this.subscription = this.messageService
-          .getAllMyMessages(user.uid)
-          .subscribe((data) => {
-            console.log(data);
-            this.$messages = removeDuplicateMessages(data);
-            this.messageService.updateMessages(this.$messages);
-            this.cdr.detectChanges();
-          });
-      }
+    authService.users$.subscribe((data) => {
+      this.users$ = data;
     });
   }
+
+  ngOnInit(): void {}
 
   getUnSeenMessages() {
     return this.$messages.filter((e) => !e.seen).length;
   }
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.userSubscription.unsubscribe();
-  }
+
   logout() {
     this.authService.logout();
+  }
+
+  // getUserProfile(uid: string) {
+  //   this.authService.getUserAccount(uid).then((data) => {
+  //     if (data.exists()) {
+  //       let current: Users = data.data();
+  //       this.authService.setUsers(current);
+  //       this.listenToMessages(current.id);
+  //     }
+  //   });
+  // }
+  listenToMessages(uid: string) {
+    this.messageService.getAllMyMessages(uid).subscribe((data) => {
+      console.log(data);
+      this.$messages = removeDuplicateMessages(data);
+      this.messageService.updateMessages(this.$messages);
+      this.cdr.detectChanges();
+    });
   }
 }

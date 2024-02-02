@@ -16,7 +16,7 @@ import {
   where,
 } from '@angular/fire/firestore';
 import { Transactions } from '../models/transaction/transactions';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { TransactionStatus } from '../models/transaction/transaction_status';
 import { TrasactionDetails } from '../models/transaction/transaction_details';
 import { Payment, PaymentStatus } from '../models/transaction/payment';
@@ -31,7 +31,10 @@ import { OrderItems } from '../models/transaction/order_items';
 })
 export class TransactionsService {
   _collection_name = 'transactions';
-
+  private transactionSubject: BehaviorSubject<Transactions[]> =
+    new BehaviorSubject<Transactions[]>([]);
+  public transactions$: Observable<Transactions[]> =
+    this.transactionSubject.asObservable();
   constructor(private firestore: Firestore) {}
   getAllTransactions(): Observable<Transactions[]> {
     const q = query(
@@ -40,7 +43,9 @@ export class TransactionsService {
     );
     return collectionData(q) as Observable<Transactions[]>;
   }
-
+  setTransactions(transaction: Transactions[]) {
+    this.transactionSubject.next(transaction);
+  }
   getAllOnlineTransactions(): Observable<Transactions[]> {
     const q = query(
       collection(this.firestore, this._collection_name),

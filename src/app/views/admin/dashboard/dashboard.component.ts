@@ -13,6 +13,7 @@ import { ProductService } from 'src/app/services/product.service';
 import { Order, Products, productToOrder } from 'src/app/models/products';
 import { OrderItems } from 'src/app/models/transaction/order_items';
 import { ProductCalculator } from 'src/app/utils/product_calc';
+import { TransactionStatus } from 'src/app/models/transaction/transaction_status';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +21,6 @@ import { ProductCalculator } from 'src/app/utils/product_calc';
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-
   _products: Products[] = [];
   _productItems: Order[] = [];
   _lowStocks: Order[] = [];
@@ -53,7 +53,8 @@ export class DashboardComponent implements OnInit {
     { data: [], label: 'Walk-In Sales' },
     { data: [], label: 'Online Orders Sales' },
   ];
-
+  ongoing$: Transactions[] = [];
+  completed$: Transactions[] = [];
   constructor(
     private toastr: ToastrService,
     private authService: AuthService,
@@ -78,8 +79,16 @@ export class DashboardComponent implements OnInit {
     this.transactionService
       .getTransactionsForCurrentYear()
       .subscribe((data) => {
+        this.ongoing$ = data.filter(
+          (e) =>
+            e.status !== TransactionStatus.COMPLETED &&
+            e.status !== TransactionStatus.CANCELLED &&
+            e.status !== TransactionStatus.FAILED
+        );
+        this.completed$ = data.filter(
+          (e) => e.status == TransactionStatus.COMPLETED
+        );
         this._transactionCalculator = new TransactionCalculator(data);
-
         this.barChartLabels = months;
         this.barChartData[0].data =
           this._transactionCalculator.generateTotalSalesPerMoth(months);

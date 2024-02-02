@@ -4,11 +4,21 @@
       <div class="box bg-white">
         <div class="d-flex flex-column align-items-center gap-2">
           <img
+            class="profile-img"
+            *ngIf="customer$?.profile !== ''; else placeholder"
             [src]="customer$?.profile"
-            class="rounded-circle"
-            width="150px"
-            height="150px"
+            width="100px"
+            height="100px"
           />
+          <ng-template #placeholder>
+            <img
+              class="profile-img"
+              src="../../../../assets/images/profile_placeholder.jpg"
+              alt="Placeholder"
+              width="100px"
+              height="100px"
+            />
+          </ng-template>
           <h5>{{ customer$?.name }}</h5>
           <span>{{ customer$?.phone }}</span>
           <div class="row text-center p-3">

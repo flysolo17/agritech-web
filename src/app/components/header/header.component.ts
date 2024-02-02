@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Users } from 'src/app/models/users';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -7,6 +8,10 @@ import { Users } from 'src/app/models/users';
   styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent {
-  @Input() users: Users | null = null;
-  @Input() newMessages: number = 0;
+  users$: Users | null = null;
+  constructor(private authService: AuthService) {
+    authService.users$.subscribe((data) => {
+      this.users$ = data;
+    });
+  }
 }

@@ -25,6 +25,7 @@ import { ViewProductComponent } from './views/inventory/view-product/view-produc
 import { EditProductComponent } from './views/inventory/edit-product/edit-product.component';
 import { MessagesComponent } from './views/messages/messages.component';
 import { ViewCustomerProfileComponent } from './views/admin/view-customer-profile/view-customer-profile.component';
+import { SettingsComponent } from './views/admin/settings/settings.component';
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'notfound', component: NotFoundComponent },
@@ -41,6 +42,7 @@ const routes: Routes = [
       { path: 'customer', component: CustomerComponent },
       { path: 'view-profile', component: ViewCustomerProfileComponent },
       { path: 'orders', component: OrdersComponent },
+      { path: 'settings', component: SettingsComponent },
       { path: 'messages', component: MessagesComponent },
       {
         path: 'review-transactions',

@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
     this.authService.getUserAccount(uid).then((value) => {
       if (value.exists()) {
         const users: Users = value.data();
-        this.authService.setUser(users);
+        this.authService.setUsers(users);
         this.identifyUser(users.type);
       } else {
         this.authService.logout();

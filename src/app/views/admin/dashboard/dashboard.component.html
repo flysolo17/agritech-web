@@ -46,19 +46,17 @@
     </div>
     <div class="col-4">
       <div class="box">
-        <h5 class="mb-3">Inventory Summary</h5>
+        <h5 class="mb-3">Order Summary</h5>
         <div class="d-flex">
           <div class="container">
             <img src="../../../../assets/images/Quantity.png" />
-            <span class="fw-bold text-secondary">{{
-              getQuantityOnHand(_productItems)
-            }}</span>
-            <p class="text-secondary">Quantity on Hand</p>
+            <span class="fw-bold text-secondary">{{ ongoing$.length }}</span>
+            <p class="text-secondary">Ongoing Orders</p>
           </div>
           <div class="container">
             <img src="../../../../assets/images/way.png" />
-            <span class="fw-bold text-secondary">800</span>
-            <p class="text-secondary">On the way</p>
+            <span class="fw-bold text-secondary">{{ completed$.length }}</span>
+            <p class="text-secondary">Completed</p>
           </div>
         </div>
       </div>

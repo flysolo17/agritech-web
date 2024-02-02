@@ -14,8 +14,7 @@ import { formatTimeDifference } from 'src/app/utils/constants';
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.css'],
 })
-export class MessagesComponent implements OnInit, OnDestroy {
-  $subscription: Subscription;
+export class MessagesComponent implements OnInit {
   $messages: Messages[] = [];
   selectedConvo: string | null = null;
   selectedCustomer: Customers | null = null;
@@ -29,26 +28,26 @@ export class MessagesComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private toatr: ToastrService
   ) {
-    this.$subscription = new Subscription();
-    const user = authService.users;
-    if (user !== null) {
-      this.getMyMessages();
-      // this.getAllCustomers()
-    } else {
-      console.log('No users!');
-    }
+    this.messagesService.getAllCustomer().subscribe({
+      next: (data) => {
+        this.$customers = data;
+      },
+    });
+    authService.users$.subscribe((data) => {
+      if (data !== null) {
+        this.getMyMessages();
+      } else {
+        console.log('No users!');
+      }
+    });
   }
 
   getMyMessages() {
-    this.$subscription = this.messagesService.messages$.subscribe((data) => {
+    this.messagesService.messages$.subscribe((data) => {
       this.$messages = data;
-      this.messagesService.updateMessages(this.$messages);
     });
   }
   ngOnInit(): void {}
-  ngOnDestroy(): void {
-    this.$subscription.unsubscribe();
-  }
 
   formatDate(timestamp: Timestamp) {
     return formatTimeDifference(timestamp);
@@ -64,11 +63,5 @@ export class MessagesComponent implements OnInit, OnDestroy {
         this.toatr.error(err);
       });
   }
-  getAllCustomers() {
-    this.messagesService.getAllCustomer().subscribe({
-      next: (data) => {
-        this.$customers = data;
-      },
-    });
-  }
+  getAllCustomers() {}
 }

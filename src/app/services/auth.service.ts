@@ -19,7 +19,7 @@ import {
 } from '@angular/fire/firestore';
 import { Users, userConverter } from '../models/users';
 import { collectionData } from 'rxfire/firestore';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import {
   Storage,
   getDownloadURL,
@@ -34,15 +34,17 @@ import { UserType } from '../models/user-type';
 })
 export class AuthService {
   _collection_name = 'users';
-  users: Users | null = null;
+  private usersSubject: BehaviorSubject<Users | null> =
+    new BehaviorSubject<Users | null>(null);
+  public users$: Observable<Users | null> = this.usersSubject.asObservable();
   constructor(
     private auth: Auth,
     private firestore: Firestore,
     private storage: Storage
   ) {}
 
-  setUser(user: Users) {
-    this.users = user;
+  setUsers(user: Users): void {
+    this.usersSubject.next(user);
   }
   getCurrentUser() {
     return user(this.auth);

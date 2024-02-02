@@ -25,14 +25,11 @@ export class ViewCustomerProfileComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-    if (this.customer$ !== null) {
-      this.transactionService
-        .getTransactionByCustomerID(this.customer$.id)
-        .subscribe((data) => {
-          this.transactions$ = data;
-          console.log(data);
-        });
-    }
+    this.transactionService.transactions$.subscribe((data) => {
+      this.transactions$ = data.filter(
+        (e) => e.customerID == this.customer$?.id
+      );
+    });
   }
   convertTimestamp(timestamp: Timestamp) {
     return formatTimestamp(timestamp);

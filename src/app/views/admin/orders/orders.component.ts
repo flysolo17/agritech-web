@@ -61,12 +61,16 @@ export class OrdersComponent implements OnInit {
     this.paymentDialog = new bootstrap.Modal(
       document.getElementById('payment') ?? ''
     );
-    this.transactionService.getAllOnlineTransactions().subscribe((value) => {
-      this._transactionList = value;
+    this.transactionService.transactions$.subscribe((value) => {
+      this._transactionList = value.filter(
+        (e) =>
+          e.type === TransactionType.DELIVERY ||
+          e.type === TransactionType.PICK_UP
+      );
       this.transactionCalculator = new TransactionCalculator(
         this._transactionList
       );
-      console.log(this._transactionList);
+
       this.cdr.detectChanges();
     });
 

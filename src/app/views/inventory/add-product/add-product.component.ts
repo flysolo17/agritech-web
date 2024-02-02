@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Products } from 'src/app/models/products';
 import { UserType } from 'src/app/models/user-type';
+import { Users } from 'src/app/models/users';
 import { Variation } from 'src/app/models/variation';
 import { AuditLogService } from 'src/app/services/audit-log.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -41,6 +42,7 @@ export class AddProductComponent implements OnInit {
 
     shipping: new FormControl(0, Validators.required),
   });
+  users: Users | null = null;
   constructor(
     private productService: ProductService,
     public loadingService: LoadingService,
@@ -50,6 +52,9 @@ export class AddProductComponent implements OnInit {
     private auditService: AuditLogService
   ) {
     this.productID = generateInvoiceID();
+    authService.users$.subscribe((data) => {
+      this.users = data;
+    });
   }
   ngOnInit(): void {
     this.createVariationModal = new window.bootstrap.Modal(
@@ -125,8 +130,8 @@ export class AddProductComponent implements OnInit {
       .then(async (data) => {
         await this.auditService.saveAudit({
           id: '',
-          email: this.authService.users?.email || '',
-          role: this.authService.users?.type || UserType.ADMIN,
+          email: this.users?.email || '',
+          role: this.users?.type || UserType.ADMIN,
           action: ActionType.CREATE,
           component: ComponentType.INVENTORY,
           payload: product,

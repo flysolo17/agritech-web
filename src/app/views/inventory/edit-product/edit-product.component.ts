@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Products } from 'src/app/models/products';
 import { UserType } from 'src/app/models/user-type';
+import { Users } from 'src/app/models/users';
 import { Variation } from 'src/app/models/variation';
 import { AuditLogService } from 'src/app/services/audit-log.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -44,6 +45,7 @@ export class EditProductComponent implements OnInit {
 
     shipping: new FormControl(0, Validators.required),
   });
+  users: Users | null = null;
   constructor(
     public loadingService: LoadingService,
     public location: Location,
@@ -53,7 +55,11 @@ export class EditProductComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
     private auditService: AuditLogService
-  ) {}
+  ) {
+    authService.users$.subscribe((data) => {
+      this.users = data;
+    });
+  }
   ngOnInit(): void {
     this.createVariationModal = new window.bootstrap.Modal(
       document.getElementById('addvariation')
@@ -179,8 +185,8 @@ export class EditProductComponent implements OnInit {
         console.log(this._default);
         await this.auditService.saveAudit({
           id: '',
-          email: this.authService.users?.email || '',
-          role: this.authService.users?.type || UserType.ADMIN,
+          email: this.users?.email || '',
+          role: this.users?.type || UserType.ADMIN,
           action: ActionType.UPDATE,
           component: ComponentType.INVENTORY,
           payload: this._default,
