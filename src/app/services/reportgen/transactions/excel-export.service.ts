@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CompanyInfoService } from './company-info.service';
+import { CompanyInfoService } from '../company-info/company-info.service';
 import * as XLSX from 'xlsx';
 
 @Injectable({

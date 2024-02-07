@@ -2,17 +2,19 @@
 import { Injectable } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
 import { timestamp } from 'rxjs';
-import * as pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 import { TDocumentDefinitions, PageOrientation } from 'pdfmake/interfaces';
-import { OrderItems } from '../../models/transaction/order_items';
-import { CompanyInfoService } from './company-info.service';
+import { OrderItems } from '../../../models/transaction/order_items';
+import { CompanyInfoService } from '../company-info/company-info.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PdfExportService {
+  [x: string]: any;
   constructor(private companyInfoService: CompanyInfoService) {}
 
   async exportToPdf({

@@ -12,9 +12,9 @@ import { Users } from 'src/app/models/users';
 import { OrderItems } from 'src/app/models/transaction/order_items';
 import { formatTimestamp, getTransactionStatus } from 'src/app/utils/constants';
 
-import { CompanyInfoService } from 'src/app/services/reportgen/company-info.service';
-import { ExcelExportService } from 'src/app/services/reportgen/excel-export.service';
-import { PdfExportService } from 'src/app/services/reportgen/pdf-export.service';
+import { CompanyInfoService } from 'src/app/services/reportgen/company-info/company-info.service';
+import { ExcelExportService } from 'src/app/services/reportgen/transactions/excel-export.service';
+import { PdfExportService } from 'src/app/services/reportgen/transactions/pdf-export.service';
 
 // Component decorator with metadata
 @Component({

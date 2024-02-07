@@ -12,6 +12,10 @@ import { DateConverterService } from 'src/app/services/date-converter.service';
 import { LoadingService } from 'src/app/services/loading.service';
 
 import { ProductService } from 'src/app/services/product.service';
+import { CompanyInfoService } from 'src/app/services/reportgen/company-info/company-info.service';
+import { ExcelExportService } from 'src/app/services/reportgen/product/excel-export.service';
+import { PdfExportService } from 'src/app/services/reportgen/product/pdf-export.service';
+
 import { formatPrice } from 'src/app/utils/constants';
 import { ProductCalculator } from 'src/app/utils/product_calc';
 
@@ -27,13 +31,18 @@ export class ProductComponent implements OnInit {
   _PRODUCTS: Products[] = [];
   productCalculator: ProductCalculator;
   users$: Users | null = null;
+
+  filteredProducts: Products[] = [];
+  filter: string = '';
   constructor(
     private productService: ProductService,
     public dateService: DateConverterService,
     private toastr: ToastrService,
     private router: Router,
     public loadingService: LoadingService,
-    public authService: AuthService
+    public authService: AuthService,
+    private pdfExportService: PdfExportService,
+    private excelExportService: ExcelExportService
   ) {
     this.productCalculator = new ProductCalculator([]);
     authService.users$.subscribe((data) => {
@@ -46,6 +55,70 @@ export class ProductComponent implements OnInit {
       this._PRODUCTS = data;
       this.productCalculator = new ProductCalculator(this._PRODUCTS);
     });
+  }
+
+  // Function to handle filter change
+  applyFilter(selectedFilter: string) {
+    this.filter = selectedFilter;
+    this.filterProducts();
+  }
+
+  // Function to filter products based on the selected filter
+  filterProducts() {
+    this.filteredProducts = [...this._PRODUCTS];
+
+    switch (this.filter) {
+      case 'alphabetical':
+        this.filteredProducts.sort((a, b) =>
+          a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })
+        );
+        break;
+
+      case 'lowQuantity':
+        this.filteredProducts.sort(
+          (a, b) => this.countStocks(a) - this.countStocks(b)
+        );
+        this.filteredProducts = this.filteredProducts.filter(
+          (product) =>
+            this.countStocks(product) >= 0 && this.countStocks(product) < 20
+        );
+        break;
+
+      case 'dateModified':
+        this.filteredProducts.sort(
+          (a, b) =>
+            (b.updatedAt || b.createdAt).getTime() -
+            (a.updatedAt || a.createdAt).getTime()
+        );
+        break;
+
+      case 'expirationDate':
+        const currentDate = new Date();
+        this.filteredProducts = this.filteredProducts.filter(
+          (product) =>
+            product.expiryDate.getTime() <=
+            currentDate.getTime() + 30 * 24 * 60 * 60 * 1000
+        );
+        this.filteredProducts.sort(
+          (a, b) => a.expiryDate.getTime() - b.expiryDate.getTime()
+        );
+        break;
+
+      default:
+        // Handle default case or do nothing
+        break;
+    }
+  }
+
+  exportToPdf(): void {
+    this.pdfExportService.exportProductsToPdf(this.filteredProducts);
+  }
+  exportToExcel(): void {
+    const excelService = new ExcelExportService(); // Create an instance
+    const filename = 'YourFilename'; // Provide a filename here
+    const companyInfo = new CompanyInfoService(); // Create an instance of CompanyInfoService
+
+    excelService.exportToExcel(this.filteredProducts, filename, companyInfo);
   }
 
   convertTimestamp(timestamp: any) {
