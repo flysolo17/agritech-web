@@ -6,7 +6,12 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
-import { TDocumentDefinitions, PageOrientation } from 'pdfmake/interfaces';
+import {
+  TDocumentDefinitions,
+  PageOrientation,
+  TableCell,
+  Table,
+} from 'pdfmake/interfaces';
 import { OrderItems } from '../../../models/transaction/order_items';
 import { CompanyInfoService } from '../company-info/company-info.service';
 
@@ -16,6 +21,17 @@ import { CompanyInfoService } from '../company-info/company-info.service';
 export class PdfExportService {
   [x: string]: any;
   constructor(private companyInfoService: CompanyInfoService) {}
+
+  testExport(table: Table) {
+    let documentDefinition: TDocumentDefinitions = {
+      content: [
+        {
+          table: table,
+        },
+      ],
+    };
+    pdfMake.createPdf(documentDefinition).download(`testlang.pdf`);
+  }
 
   async exportToPdf({
     data,

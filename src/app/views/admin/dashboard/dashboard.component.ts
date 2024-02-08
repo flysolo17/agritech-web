@@ -14,6 +14,8 @@ import { Order, Products, productToOrder } from 'src/app/models/products';
 import { OrderItems } from 'src/app/models/transaction/order_items';
 import { ProductCalculator } from 'src/app/utils/product_calc';
 import { TransactionStatus } from 'src/app/models/transaction/transaction_status';
+import { TargetSalesService } from 'src/app/services/target-sales.service';
+import { TargetSales } from 'src/app/models/sales/target-sales';
 
 @Component({
   selector: 'app-dashboard',
@@ -55,15 +57,40 @@ export class DashboardComponent implements OnInit {
   ];
   ongoing$: Transactions[] = [];
   completed$: Transactions[] = [];
+
+  targetSales$: TargetSales[] = [];
+
   constructor(
     private toastr: ToastrService,
     private authService: AuthService,
     private transactionService: TransactionsService,
     private loadingService: LoadingService,
     private cdr: ChangeDetectorRef,
-    private productService: ProductService
-  ) {}
+    private productService: ProductService,
+    private targetSalesService: TargetSalesService
+  ) {
+    targetSalesService.getAllTargetSales('2024').subscribe((data) => {
+      this.targetSales$ = data;
+      this.updateBarChartData();
+      console.log(this.targetSales$);
+    });
+  }
 
+  updateBarChartData(): void {
+    const targetSalesData = Array(12).fill(0); // Initialize an array of zeros for target sales data
+    this.targetSales$.forEach((sale) => {
+      if (months.includes(sale.month.substring(0, 3))) {
+        console.log(
+          `${sale.month} = ${months.includes(sale.month.substring(0, 3))}`
+        );
+        const monthIndex = months.indexOf(sale.month.substring(0, 3));
+        if (monthIndex !== -1) {
+          targetSalesData[monthIndex] += sale.sale;
+        }
+      }
+    });
+    this.barChartData[1].data = targetSalesData;
+  }
   ngOnInit(): void {
     this.productService.getAllProducts().subscribe((data: Products[]) => {
       this._products = data;
@@ -93,12 +120,6 @@ export class DashboardComponent implements OnInit {
         this.barChartData[0].data =
           this._transactionCalculator.generateTotalSalesPerMoth(months);
 
-        console.log('Transactions', this.barChartData[0]);
-        this.barChartData[1].data =
-          this._productCalculator.getTargetStocksPerMonth(months);
-
-        console.log('Target Sales', this.barChartData[1]);
-
         this.lineChartLabels = Array.from(
           this._transactionCalculator.calculateTotalSalesByWalkIn().keys()
         ) as string[];
@@ -108,16 +129,6 @@ export class DashboardComponent implements OnInit {
         this.lineChartData[1].data = Array.from(
           this._transactionCalculator.calculateTotalOnlineOrders().values()
         ) as number[];
-
-        console.log(
-          'online',
-          this._transactionCalculator.calculateTotalOnlineOrders()
-        );
-
-        console.log(
-          'walk in ',
-          this._transactionCalculator.calculateTotalSalesByWalkIn()
-        );
 
         this.cdr.detectChanges();
       });

@@ -45,6 +45,7 @@ export class AdminMainComponent implements OnInit {
       });
     authService.users$.subscribe((data) => {
       this.users$ = data;
+      this.listenToMessages(data?.id ?? '');
     });
   }
 

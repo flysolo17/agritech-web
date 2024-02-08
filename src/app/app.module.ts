@@ -60,6 +60,8 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { EditCmsComponent } from './components/edit-cms/edit-cms.component';
 import { ViewCustomerProfileComponent } from './views/admin/view-customer-profile/view-customer-profile.component';
 import { SettingsComponent } from './views/admin/settings/settings.component';
+import { AddTargetSalesComponent } from './components/add-target-sales/add-target-sales.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -108,6 +110,7 @@ import { SettingsComponent } from './views/admin/settings/settings.component';
     EditCmsComponent,
     ViewCustomerProfileComponent,
     SettingsComponent,
+    AddTargetSalesComponent,
   ],
   imports: [
     BrowserAnimationsModule,

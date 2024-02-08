@@ -10,6 +10,8 @@ h5 {
 
 .settings-container {
   padding: 10px;
+  display: flex;
+  gap: 1rem;
 }
 
 .settings-col {

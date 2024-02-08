@@ -3,79 +3,124 @@
     <div class="containers p-3">
       <h5>Settings</h5>
       <div class="settings-container">
-        <div class="row">
-          <!-- Target Sales Row -->
-          <div class="col settings-col">
-            <div class="row target-sales-row">
-              <div class="col target-sales-header">
-                <h6 class="label">Target Sales</h6>
-              </div>
-              <div class="col">
-                <input class="form-control target-sales-input" type="number" />
-              </div>
-              <div class="col">
-                <button class="btn btn-outline-secondary">Save changes</button>
-              </div>
-            </div>
-          </div>
+        <div class="target-sales w-75">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5>Target Sales</h5>
 
-          <!-- System Lockdown Row -->
-          <div class="col settings-col">
-            <div class="row system-lockdown-row">
-              <div class="col system-lockdown-header">
-                <h6 class="label">System Lockdown</h6>
-              </div>
-              <div class="col">
-                <label class="switch">
-                  <input type="checkbox" id="systemLockdownToggle" />
-                  <span class="slider round"></span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Clearfix for New Row -->
-          <div class="w-100"></div>
-
-          <!-- Payment QR Code Row -->
-          <div class="col settings-col">
-            <div class="row payment-qr-code-row">
-              <div class="col payment-qr-code-header">
-                <h6 class="label">Payment QR Code</h6>
-              </div>
-              <div class="col">
-                <button class="custom-button">
+            <div class="d-flex gap-1">
+              <div class="dropdown">
+                <button
+                  class="btn btn-outline-secondary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
+                    width="24"
+                    height="24"
                     fill="currentColor"
-                    class="bi bi-plus"
+                    class="bi bi-filter"
                     viewBox="0 0 16 16"
                   >
                     <path
-                      d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+                      d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"
                     />
                   </svg>
-                  <input accept="image/*" type="file" />
-                  Add image
+                  Filter By Year
                 </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item">2024</a></li>
+                  <li><a class="dropdown-item">2025</a></li>
+                  <li><a class="dropdown-item">2026</a></li>
+                </ul>
               </div>
-              <div class="col">
-                <button class="btn btn-outline-secondary">Save changes</button>
-              </div>
+
+              <app-add-target-sales></app-add-target-sales>
             </div>
           </div>
 
-          <!-- Backup-Data Row -->
-          <div class="col settings-col">
-            <div class="row backup-data-row">
-              <div class="col backup-data-header">
-                <h6 class="label">Backup Data</h6>
-              </div>
-              <div class="col">
-                <button class="btn btn-primary">Download</button>
-              </div>
+          <table class="table table-hover table-borderless">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Target</th>
+                <th scope="col">Month</th>
+                <th scope="col">Year</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let target of targetSales$; index as index">
+                <th scope="row">{{ index + 1 }}</th>
+                <td>
+                  {{target.sale.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'PHP',
+                })}}
+                </td>
+                <td>{{ target.month }}</td>
+                <td>{{ target.year }}</td>
+                <td>
+                  <button
+                    class="btn btn-danger"
+                    (click)="deleteTargetSales(target.id)"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-calendar-x"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708"
+                      />
+                      <path
+                        d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"
+                      />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="payments-qr w-25">
+          <div class="d-flex gap-1 align-items-center justify-content-between">
+            <h5>Payments</h5>
+            <div class="container bg-dark">
+              <label class="btn btn-primary btn-file">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-plus"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
+                  />
+                </svg>
+                <input
+                  type="file"
+                  style="display: none"
+                  (change)="onFileSelected($event)"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col" *ngFor="let payment of paymentQrs$">
+              <img
+                [src]="payment.qr"
+                width="100px"
+                height="100px"
+                (click)="navigateToPaymentQR(payment.qr)"
+              />
             </div>
           </div>
         </div>
