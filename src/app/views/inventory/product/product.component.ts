@@ -44,18 +44,18 @@ export class ProductComponent implements OnInit {
     private pdfExportService: PdfExportService,
     private excelExportService: ExcelExportService
   ) {
+    this.productService.getAllProducts().subscribe((data: Products[]) => {
+      this._PRODUCTS = data;
+      this.filteredProducts = data;
+      this.productCalculator = new ProductCalculator(this._PRODUCTS);
+    });
     this.productCalculator = new ProductCalculator([]);
     authService.users$.subscribe((data) => {
       this.users$ = data;
     });
   }
 
-  ngOnInit(): void {
-    this.productService.getAllProducts().subscribe((data: Products[]) => {
-      this._PRODUCTS = data;
-      this.productCalculator = new ProductCalculator(this._PRODUCTS);
-    });
-  }
+  ngOnInit(): void {}
 
   // Function to handle filter change
   applyFilter(selectedFilter: string) {
