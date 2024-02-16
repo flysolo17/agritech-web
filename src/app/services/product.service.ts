@@ -87,14 +87,14 @@ export class ProductService {
     }
   }
 
-  listenToProduct(productID: string) {
-    console.log(productID);
-    const productDocRef = doc(
-      collection(this.firestore, this._collection_name),
-      productID
-    ).withConverter(productConverter);
-    return docData(productDocRef, { idField: productID });
-  }
+  // listenToProduct(productID: string) {
+  //   console.log(productID);
+  //   const productDocRef = doc(
+  //     collection(this.firestore, this._collection_name),
+  //     productID
+  //   ).withConverter(productConverter);
+  //   return docData(productDocRef, { idField: productID });
+  // }
 
   addToFeaturedProduct(productID: string) {
     const product = doc(

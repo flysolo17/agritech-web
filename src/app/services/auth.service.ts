@@ -47,7 +47,7 @@ export class AuthService {
     this.usersSubject.next(user);
   }
   getCurrentUser() {
-    return user(this.auth);
+    return user(this.auth as any);
   }
   login(email: string, password: string) {
     return signInWithEmailAndPassword(this.auth, email, password);

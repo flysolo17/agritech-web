@@ -54,7 +54,7 @@ export class TransactionsComponent implements OnInit {
   // Lifecycle hook - ngOnInit
   ngOnInit(): void {
     this.transactionService.transactions$.subscribe((data) => {
-      this.dataSource = data
+      this.dataSource = data;
       this.recentTransactions = data.filter(
         (e) =>
           e.createdAt.toDate() >= startOfDay(new Date()) &&

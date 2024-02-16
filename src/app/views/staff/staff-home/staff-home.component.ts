@@ -49,6 +49,16 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
     private transactionService: TransactionsService,
     private auditService: AuditLogService
   ) {
+    this.productService.getAllProducts().subscribe((data: Products[]) => {
+      this._categories = this.getCategories(
+        data.map((e) => e.category.toLowerCase())
+      );
+      this._productItems = [];
+      this._products = data;
+      this._products.map((product) => {
+        this._productItems.push(...productToOrder(product));
+      });
+    });
     this.authService.users$.subscribe((value) => {
       this._users = value;
     });
@@ -63,16 +73,6 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.productService.getAllProducts().subscribe((data: Products[]) => {
-      this._categories = this.getCategories(
-        data.map((e) => e.category.toLowerCase())
-      );
-      this._productItems = [];
-      this._products = data;
-      this._products.map((product) => {
-        this._productItems.push(...productToOrder(product));
-      });
-    });
     this.checkoutModal = new window.bootstrap.Modal(
       document.getElementById('checkoutModal')
     );

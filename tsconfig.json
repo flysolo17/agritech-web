@@ -20,7 +20,8 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
@@ -28,6 +29,7 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
+
     "enableIvy": false
   }
 }

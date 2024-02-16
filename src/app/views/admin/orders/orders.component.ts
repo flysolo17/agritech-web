@@ -122,7 +122,7 @@ export class OrdersComponent implements OnInit {
         });
         this.toastrService.success('Order is accepted!');
       })
-      .catch((err) => this.toastrService.error(err.message))
+      .catch((err: any) => this.toastrService.error(err.message))
       .finally(() => this.loadingService.hideLoading(transactionID));
   }
 

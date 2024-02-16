@@ -20,7 +20,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { TransactionStatus } from '../models/transaction/transaction_status';
 import { TrasactionDetails } from '../models/transaction/transaction_details';
 import { Payment, PaymentStatus } from '../models/transaction/payment';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { TransactionType } from '../models/transaction/transaction_type';
 import { v4 as uuidv4 } from 'uuid';
 import { generateInvoiceID } from '../utils/constants';
@@ -62,28 +62,6 @@ export class TransactionsService {
     );
     return collectionData(q) as Observable<Transactions[]>;
   }
-
-  acceptTransaction(
-    employeeID: string,
-    transactionID: string,
-    status: TransactionStatus,
-    details: TrasactionDetails,
-    payment: Payment
-  ) {
-    const transactionRef = doc(
-      this.firestore,
-      this._collection_name,
-      transactionID
-    );
-
-    const updatedData = {
-      cashierID: employeeID,
-      status: status,
-      details: arrayUnion(details),
-      payment: payment,
-    };
-    return updateDoc(transactionRef, updatedData);
-  }
   updateTransactionStatus(
     transactionID: string,
     status: TransactionStatus,
@@ -119,6 +97,28 @@ export class TransactionsService {
       transaction
     );
   }
+
+  acceptTransaction(
+    employeeID: string,
+    transactionID: string,
+    status: TransactionStatus,
+    details: TrasactionDetails,
+    payment: Payment
+  ) {
+    const transactionRef = doc(
+      this.firestore,
+      this._collection_name,
+      transactionID
+    );
+
+    const updatedData = {
+      cashierID: employeeID,
+      status: status,
+      details: arrayUnion(details),
+      payment: payment,
+    };
+    return updateDoc(transactionRef, updatedData);
+  }
   getAllTransactionsByCashier(cashierID: string): Observable<Transactions[]> {
     const q = query(
       collection(this.firestore, this._collection_name),
@@ -132,7 +132,7 @@ export class TransactionsService {
     return updateDoc(
       doc(this.firestore, this._collection_name, transactionID),
       {
-        driverID: uid,
+        cashierID: uid,
       }
     );
   }
