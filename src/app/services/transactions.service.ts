@@ -202,11 +202,14 @@ export class TransactionsService {
   // }
 
   getTransactionsForCurrentYear(): Observable<Transactions[]> {
-    const currentYear = dayjs().year();
+    const currentYear = dayjs.default().year();
 
-    const startDate = dayjs(`${currentYear}-01-01`).startOf('day').toDate();
+    const startDate = dayjs
+      .default(`${currentYear}-01-01`)
+      .startOf('day')
+      .toDate();
 
-    const endDate = dayjs(`${currentYear}-12-31`).endOf('day').toDate();
+    const endDate = dayjs.default(`${currentYear}-12-31`).endOf('day').toDate();
 
     const startTimestamp = Timestamp.fromDate(startDate);
     const endTimestamp = Timestamp.fromDate(endDate);

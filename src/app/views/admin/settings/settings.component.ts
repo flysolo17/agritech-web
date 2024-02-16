@@ -11,25 +11,35 @@ import { Subscription } from 'rxjs';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css'],
 })
-export class SettingsComponent implements OnInit, OnDestroy {
+export class SettingsComponent implements OnDestroy {
   selectedDate: string = new Date().getFullYear().toString();
   targetSales: TargetSales[] = [];
   paymentQrs: PaymentQr[] = [];
-  private paymentQrsSubscription!: Subscription;
+  private paymentQrsSubscription: Subscription;
 
   constructor(
     private targetSalesService: TargetSalesService,
     private toastr: ToastrService,
     private paymentService: PaymentService
-  ) {}
-
-  ngOnInit() {
-    this.loginUser();
-  }
-  loginUser() {
-    this.loadPaymentQrs();
+  ) {
     this.getTargetSalesByYear(this.selectedDate);
+    this.paymentQrsSubscription = paymentService
+      .getAllPaymentQr()
+      .subscribe((data) => {
+        this.paymentQrs = data;
+      });
   }
+
+  ngOnDestroy(): void {
+    if (this.paymentQrsSubscription) {
+      this.paymentQrsSubscription.unsubscribe();
+    }
+  }
+
+  // loginUser() {
+  //   this.loadPaymentQrs();
+  //   this.getTargetSalesByYear(this.selectedDate);
+  // }
 
   getTargetSalesByYear(year: string) {
     this.targetSalesService.getAllTargetSales(year).subscribe(
@@ -64,7 +74,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.paymentService.uploadPaymentQr(file).then(
       () => {
         this.toastr.success('Successfully uploaded!');
-        this.loadPaymentQrs();
       },
       (error) => {
         this.toastr.error('Failed to upload payment QR code.');
@@ -92,25 +101,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
           this.toastr.error('Failed to delete payment QR code.');
         }
       );
-    }
-  }
-
-  private loadPaymentQrs() {
-    this.paymentQrsSubscription = this.paymentService
-      .getAllPaymentQr()
-      .subscribe(
-        (data) => {
-          this.paymentQrs = data;
-        },
-        (error) => {
-          this.toastr.error('Failed to retrieve payment QR codes.');
-        }
-      );
-  }
-
-  ngOnDestroy() {
-    if (this.paymentQrsSubscription) {
-      this.paymentQrsSubscription.unsubscribe();
     }
   }
 }

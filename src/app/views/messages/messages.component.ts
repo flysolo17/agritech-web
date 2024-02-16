@@ -65,7 +65,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
                 message.senderID === customer.id ||
                 message.receiverID === customer.id
             );
-            console.log(messages);
+
             return {
               customers: customer,
               messages: filteredMessages.reverse(),

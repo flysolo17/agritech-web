@@ -30,7 +30,7 @@ export class PdfExportService {
       price: product.price,
       quantity: product.stocks,
       expiryDate: product.expiryDate.toLocaleDateString(),
-      availability: this.getAvailabilityStatus(product), // Include availability status
+      availability: this.getAvailabilityStatus(product),
     }));
 
     const documentDefinition: TDocumentDefinitions = {
