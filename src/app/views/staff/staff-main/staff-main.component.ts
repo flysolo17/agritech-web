@@ -16,17 +16,21 @@ import { removeDuplicateMessages } from 'src/app/utils/constants';
 export class StaffMainComponent implements OnInit, OnDestroy {
   transactionSubscription: Subscription;
   $transactions: Transactions[] = [];
-
+  $messages: Messages[] = [];
   constructor(
     public authService: AuthService,
     private messageService: MessagesService,
     private transactionService: TransactionsService
   ) {
-    this.transactionSubscription = new Subscription();
+    authService.users$.subscribe((data) => {
+      this.listenToMessages(data?.id ?? '');
+    });
+
     this.transactionSubscription = this.transactionService
-      .getPendingOrders()
+      .getAllTransactions()
       .subscribe((data) => {
-        this.$transactions = data;
+        this.transactionService.setTransactions(data);
+        this.$transactions = data.filter((e) => e.status === 'PENDING');
       });
   }
 
@@ -34,5 +38,15 @@ export class StaffMainComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.transactionSubscription.unsubscribe();
+  }
+  listenToMessages(uid: string) {
+    this.messageService.getAllMyMessages(uid).subscribe((data) => {
+      console.log(data);
+      this.$messages = removeDuplicateMessages(data);
+      this.messageService.updateMessages(data);
+    });
+  }
+  getUnSeenMessages() {
+    return this.$messages.filter((e) => !e.seen).length;
   }
 }

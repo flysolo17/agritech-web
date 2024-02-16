@@ -186,4 +186,27 @@ export class ProductComponent implements OnInit {
     }
     return 'admin';
   }
+
+  displayExpiryDate(expiryDate: Date): string {
+    const currentDate = new Date();
+    const oneWeek = 7 * 24 * 60 * 60 * 1000; // One week in milliseconds
+
+    if (expiryDate.getTime() >= currentDate.getTime()) {
+      const timeDiff = expiryDate.getTime() - currentDate.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+      if (daysDiff <= 0) {
+        return 'Expired';
+      } else if (daysDiff <= 7) {
+        return `${daysDiff} day${daysDiff === 1 ? '' : 's'} left`;
+      } else {
+        const month = expiryDate.getMonth() + 1;
+        const day = expiryDate.getDate();
+        const year = expiryDate.getFullYear();
+        return `${month}/${day}/${year}`;
+      }
+    } else {
+      return 'Expired';
+    }
+  }
 }

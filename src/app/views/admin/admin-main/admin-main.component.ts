@@ -52,7 +52,7 @@ export class AdminMainComponent implements OnInit {
   ngOnInit(): void {}
 
   getUnSeenMessages() {
-    return this.$messages.filter((e) => !e.seen).length;
+    return this.$messages.filter((e) => e.senderID !== this.users$?.id).length;
   }
 
   logout() {
@@ -70,9 +70,8 @@ export class AdminMainComponent implements OnInit {
   // }
   listenToMessages(uid: string) {
     this.messageService.getAllMyMessages(uid).subscribe((data) => {
-      console.log(data);
       this.$messages = removeDuplicateMessages(data);
-      this.messageService.updateMessages(this.$messages);
+      this.messageService.updateMessages(data);
       this.cdr.detectChanges();
     });
   }

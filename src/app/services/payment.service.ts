@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   Firestore,
   collection,
+  deleteDoc,
   doc,
   orderBy,
   query,
@@ -18,13 +19,18 @@ import {
   uploadBytes,
 } from '@angular/fire/storage';
 import { uuidv4 } from '@firebase/util';
+import { ToastrService } from 'ngx-toastr';
 
 const PAYMENT_QR_COLLECTION = 'PaymentQR';
 @Injectable({
   providedIn: 'root',
 })
 export class PaymentService {
-  constructor(private firestore: Firestore, private storage: Storage) {}
+  constructor(
+    private firestore: Firestore,
+    private storage: Storage,
+    private toastr: ToastrService
+  ) {}
   async uploadPaymentQr(file: File) {
     try {
       const batch = writeBatch(this.firestore);
@@ -68,5 +74,14 @@ export class PaymentService {
       orderBy('createdAt', 'desc')
     );
     return collectionData(q) as Observable<PaymentQr[]>;
+  }
+  async deletePaymentQr(paymentQrId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(this.firestore, PAYMENT_QR_COLLECTION, paymentQrId));
+    } catch (error) {
+      console.error('Error deleting payment QR code:', error);
+      this.toastr.error('Failed to delete payment QR code.');
+      throw error;
+    }
   }
 }

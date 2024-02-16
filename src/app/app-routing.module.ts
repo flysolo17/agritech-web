@@ -73,15 +73,16 @@ const routes: Routes = [
       { path: 'orders', component: OrdersComponent },
       { path: 'messages', component: MessagesComponent },
       {
+        path: 'transactions',
+        component: TransactionsComponent,
+      },
+      {
         path: 'review-transactions',
         component: ReviewTransactionComponent,
       },
     ],
   },
-  {
-    path: 'staff/transactions/:users',
-    component: TransactionsComponent,
-  },
+
   {
     path: 'messages',
     component: MessagesComponent,

@@ -29,9 +29,9 @@ declare var window: any;
   templateUrl: './staff-home.component.html',
   styleUrls: ['./staff-home.component.css'],
 })
-export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
+export class StaffHomeComponent implements OnInit, AfterViewInit {
   checkoutModal: any;
-  _subscription: Subscription;
+
   _products: Products[] = [];
   _categories: string[] = [];
   _productItems: Order[] = [];
@@ -49,35 +49,33 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private transactionService: TransactionsService,
     private auditService: AuditLogService
   ) {
-    this._subscription = new Subscription();
+    this.authService.users$.subscribe((value) => {
+      this._users = value;
+    });
+  }
+
+  getCategories(data: string[]): string[] {
+    const uniqueCategoriesSet: Set<string> = new Set();
+    data.forEach((category) => {
+      uniqueCategoriesSet.add(category);
+    });
+    return Array.from(uniqueCategoriesSet);
   }
 
   ngOnInit(): void {
+    this.productService.getAllProducts().subscribe((data: Products[]) => {
+      this._categories = this.getCategories(
+        data.map((e) => e.category.toLowerCase())
+      );
+      this._productItems = [];
+      this._products = data;
+      this._products.map((product) => {
+        this._productItems.push(...productToOrder(product));
+      });
+    });
     this.checkoutModal = new window.bootstrap.Modal(
       document.getElementById('checkoutModal')
     );
-    this._subscription = this.productService
-      .getAllProducts()
-      .subscribe((data: Products[]) => {
-        this._products = data;
-        this._products.map((product) => {
-          this._productItems.push(...productToOrder(product));
-        });
-        this._categories = data.map((e) => e.category.toLowerCase());
-        const uniqueCategoriesSet = new Set();
-        this._categories = this._categories.filter((category) => {
-          if (!uniqueCategoriesSet.has(category)) {
-            uniqueCategoriesSet.add(category);
-            return true;
-          }
-          return false;
-        });
-      });
-    this.authService.getCurrentUser().subscribe((value) => {
-      if (value != null) {
-        this.getUserInfo(value.uid);
-      }
-    });
   }
 
   filterProductsPercategory(category: string): Order[] {
@@ -90,12 +88,6 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     const element = document.getElementById('productTabs');
     if (element) {
       new bootstrap.Tab(element).show();
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this._subscription) {
-      this._subscription.unsubscribe();
     }
   }
 
@@ -172,7 +164,6 @@ export class StaffHomeComponent implements OnInit, OnDestroy, AfterViewInit {
           timestamp: Timestamp.now(),
         });
 
-        this._productItems = [];
         this.toastr.success('transasction success');
       })
       .catch((err) => this.toastr.error(err.message))

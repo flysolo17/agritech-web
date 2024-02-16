@@ -198,7 +198,10 @@ export function removeDuplicateMessages(messages: Messages[]): Messages[] {
   return uniqueMessages;
 }
 
-export function formatTimeDifference(timestamp: Timestamp): string {
+export function formatTimeDifference(timestamp: Timestamp | null): string {
+  if (timestamp === null) {
+    return '';
+  }
   const now = new Date();
   const dateTime = timestamp.toDate(); // Convert Firestore Timestamp to Date
   const difference = Math.abs(now.getTime() - dateTime.getTime());
@@ -241,4 +244,16 @@ export function getDefaultAddress(
   });
 
   return defaultAddress ?? null;
+}
+
+export function startOfDay(date: Date): Date {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+export function endOfDay(date: Date): Date {
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+  return end;
 }

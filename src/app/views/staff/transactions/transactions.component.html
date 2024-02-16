@@ -96,7 +96,7 @@
       >
         <!-- Check if there are transactions made today -->
         <ng-container
-          *ngIf="getTransactionsMadeToday().length > 0; else noTransactions"
+          *ngIf="recentTransactions.length > 0; else noTransactions"
         >
           <div class="tools-button">
             <!-- <button mat-button class="btn btn-outline-secondary export-excel" (click)="exportToExcel()">
@@ -187,9 +187,7 @@
         aria-labelledby="profile-tab"
         tabindex="0"
       >
-        <ng-container
-          *ngIf="_transactionList.length > 0; else loadTransactions"
-        >
+        <ng-container *ngIf="dataSource.length > 0; else loadTransactions">
           <div class="tools-button">
             <!-- <button mat-button class="btn btn-outline-secondary export-excel" (click)="exportToExcel()">
               <i class="bi bi-filetype-xlsx"></i> Download as Excel
@@ -214,13 +212,8 @@
                   class="search-input"
                   type="text"
                   placeholder=" invoice id, customer name, product name"
-                  [(ngModel)]="searchQuery"
                 />
-                <button
-                  mat-button
-                  class="btn btn-outline-secondary search"
-                  (click)="onSearch(searchQuery)"
-                >
+                <button class="btn btn-outline-secondary search">
                   <i class="bi bi-search"></i>
                 </button>
               </div>

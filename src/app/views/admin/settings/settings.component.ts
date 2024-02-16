@@ -1,57 +1,116 @@
-import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PaymentQr } from 'src/app/models/payments-qr';
 import { TargetSales } from 'src/app/models/sales/target-sales';
 import { PaymentService } from 'src/app/services/payment.service';
 import { TargetSalesService } from 'src/app/services/target-sales.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css'],
 })
-export class SettingsComponent {
-  selectedDate$ = new Date().getFullYear().toString();
-  targetSales$: TargetSales[] = [];
-  paymentQrs$: PaymentQr[] = [];
+export class SettingsComponent implements OnInit, OnDestroy {
+  selectedDate: string = new Date().getFullYear().toString();
+  targetSales: TargetSales[] = [];
+  paymentQrs: PaymentQr[] = [];
+  private paymentQrsSubscription!: Subscription;
+
   constructor(
     private targetSalesService: TargetSalesService,
     private toastr: ToastrService,
-    private paymentQrService: PaymentService
-  ) {
-    paymentQrService.getAllPaymentQr().subscribe((data) => {
-      this.paymentQrs$ = data;
-      console.log(this.paymentQrs$);
-    });
-    this.getTargetSalesByYear(this.selectedDate$);
+    private paymentService: PaymentService
+  ) {}
+
+  ngOnInit() {
+    this.loginUser();
+  }
+  loginUser() {
+    this.loadPaymentQrs();
+    this.getTargetSalesByYear(this.selectedDate);
   }
 
   getTargetSalesByYear(year: string) {
-    console.log(year);
-    this.targetSalesService.getAllTargetSales(year).subscribe((data) => {
-      this.targetSales$ = data;
-    });
+    this.targetSalesService.getAllTargetSales(year).subscribe(
+      (data) => {
+        this.targetSales = data;
+      },
+      (error) => {
+        this.toastr.error('Failed to retrieve target sales.');
+      }
+    );
   }
+
   deleteTargetSales(id: string) {
-    this.targetSalesService
-      .deleteTargetSales(id)
-      .then(() => this.toastr.success('Successfully Deleted'))
-      .catch((err) => this.toastr.error(err.toString()));
+    this.targetSalesService.deleteTargetSales(id).then(
+      () => {
+        this.toastr.success('Successfully Deleted');
+      },
+      (error) => {
+        this.toastr.error('Failed to delete target sales.');
+      }
+    );
   }
+
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
       this.uploadPayment(file);
     }
   }
+
   uploadPayment(file: File) {
-    this.paymentQrService
-      .uploadPaymentQr(file)
-      .then(() => this.toastr.success('Successfuly uploaded!'))
-      .catch((err) => this.toastr.error(err.toString()));
+    this.paymentService.uploadPaymentQr(file).then(
+      () => {
+        this.toastr.success('Successfully uploaded!');
+        this.loadPaymentQrs();
+      },
+      (error) => {
+        this.toastr.error('Failed to upload payment QR code.');
+      }
+    );
   }
+
   navigateToPaymentQR(downloadUrl: string) {
     window.open(downloadUrl, '_blank');
+  }
+
+  deletePaymentQr(paymentQrId: string, qrUrl: string, index: number) {
+    const currentQrUrl = this.paymentQrs[0]?.qr;
+    if (qrUrl === currentQrUrl) {
+      this.toastr.warning("You can't delete the current QR code.");
+    } else {
+      this.paymentService.deletePaymentQr(paymentQrId).then(
+        () => {
+          this.toastr.success('Payment QR code deleted successfully.');
+          this.paymentQrs = this.paymentQrs.filter(
+            (qr) => qr.id !== paymentQrId
+          );
+        },
+        (error) => {
+          this.toastr.error('Failed to delete payment QR code.');
+        }
+      );
+    }
+  }
+
+  private loadPaymentQrs() {
+    this.paymentQrsSubscription = this.paymentService
+      .getAllPaymentQr()
+      .subscribe(
+        (data) => {
+          this.paymentQrs = data;
+        },
+        (error) => {
+          this.toastr.error('Failed to retrieve payment QR codes.');
+        }
+      );
+  }
+
+  ngOnDestroy() {
+    if (this.paymentQrsSubscription) {
+      this.paymentQrsSubscription.unsubscribe();
+    }
   }
 }

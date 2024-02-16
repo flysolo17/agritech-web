@@ -53,6 +53,9 @@ export class OrdersComponent implements OnInit {
     private auditService: AuditLogService
   ) {
     this.transactionCalculator = new TransactionCalculator([]);
+    authService.users$.subscribe((data) => {
+      this._users = data;
+    });
   }
   ngOnInit(): void {
     this.driversDialog = new window.bootstrap.Modal(
@@ -72,12 +75,6 @@ export class OrdersComponent implements OnInit {
       );
 
       this.cdr.detectChanges();
-    });
-
-    this.authService.getCurrentUser().subscribe((value) => {
-      if (value != null) {
-        this.getUserInfo(value.uid);
-      }
     });
   }
   convertTimestamp(timestamp: Timestamp) {
@@ -101,7 +98,8 @@ export class OrdersComponent implements OnInit {
   acceptOrder(transactionID: string, payment: Payment) {
     this.loadingService.showLoading(transactionID);
     this.transactionService
-      .updateTransactionStatus(
+      .acceptTransaction(
+        this._users?.id ?? '',
         transactionID,
         TransactionStatus.ACCEPTED,
         generateTransactionDetails(TransactionStatus.ACCEPTED),

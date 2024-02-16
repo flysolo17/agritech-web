@@ -1,12 +1,11 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Timestamp } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentType } from 'src/app/models/transaction/payment';
 import { TransactionType } from 'src/app/models/transaction/transaction_type';
 import { Transactions } from 'src/app/models/transaction/transactions';
 import { Address } from 'src/app/models/user_address';
-import { formatTimestamp } from 'src/app/utils/constants';
+import { PdfExportService } from 'src/app/services/review-transaction/pdf-export-service.service';
 
 @Component({
   selector: 'app-review-transaction',
@@ -17,7 +16,8 @@ export class ReviewTransactionComponent implements OnInit {
   _transaction: Transactions | null = null;
   constructor(
     private activatedRoute: ActivatedRoute,
-    public location: Location
+    public location: Location,
+    private pdfExportService: PdfExportService
   ) {}
   paymentDate: string = '';
   ngOnInit(): void {
@@ -26,9 +26,6 @@ export class ReviewTransactionComponent implements OnInit {
 
       const transaction: Transactions = JSON.parse(transactions);
       this._transaction = transaction;
-      if (transaction.payment.details !== null) {
-        this.formatPaymentDate(transaction.payment.details?.createdAt);
-      }
 
       console.log('Transaction:', transaction);
     });
@@ -46,10 +43,20 @@ export class ReviewTransactionComponent implements OnInit {
     return false;
   }
 
-  displayAddress(address: Address) {
+  displayAddress(address: Address | null) {
+    if (address === null) {
+      return '';
+    }
     return `${address.landmark}, ${address.barangay}, ${address.city}, ${address?.province}, ${address?.region} | ${address?.postalCode}`;
   }
-  formatPaymentDate(date: Timestamp) {
-    this.paymentDate = formatTimestamp(date);
+
+  downloadPdf(): void {
+    if (this._transaction) {
+      this.pdfExportService.exportTransactionAsPdf(this._transaction);
+    }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

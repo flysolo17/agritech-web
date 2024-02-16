@@ -10,7 +10,11 @@ import { SearchService } from 'src/app/services/search.service';
 import { Transactions } from 'src/app/models/transaction/transactions';
 import { Users } from 'src/app/models/users';
 import { OrderItems } from 'src/app/models/transaction/order_items';
-import { formatTimestamp, getTransactionStatus } from 'src/app/utils/constants';
+import {
+  formatTimestamp,
+  getTransactionStatus,
+  startOfDay,
+} from 'src/app/utils/constants';
 
 import { CompanyInfoService } from 'src/app/services/reportgen/company-info/company-info.service';
 import { ExcelExportService } from 'src/app/services/reportgen/transactions/excel-export.service';
@@ -41,49 +45,21 @@ export class TransactionsComponent implements OnInit {
     private excelService: ExcelExportService,
     private pdfService: PdfExportService,
     public location: Location
-  ) {}
+  ) {
+    authService.users$.subscribe((data) => {
+      this._users = data;
+    });
+  }
 
   // Lifecycle hook - ngOnInit
   ngOnInit(): void {
-    this.extractUserIdFromRoute();
-    this.fetchUserInfoAndTransactions();
-    this.subscribeToSearchService();
-  }
-
-  // Public API method - Method triggered on search
-  onSearch(query: string): void {
-    this.filterTransactions(query);
-  }
-
-  // Helper methods...
-
-  private extractUserIdFromRoute(): void {
-    const userId = this.activatedRoute.snapshot.paramMap.get('users');
-    const users: Users | null = JSON.parse(userId ?? '') ?? null;
-
-    this.getUserInfo(users?.id ?? '');
-  }
-
-  private fetchUserInfoAndTransactions(): void {
-    this.fetchTransactionsForUser();
-  }
-
-  private fetchTransactionsForUser(): void {
-    const userId = this.activatedRoute.snapshot.paramMap.get('users');
-    const users: Users | null = JSON.parse(userId ?? '') ?? null;
-
-    this.transactionService
-      .getAllTransactionsByCashier(users?.id ?? '')
-      .subscribe((data) => {
-        this.dataSource = data;
-        this._transactionList = data;
-        this.recentTransactions = this.getTransactionsMadeToday();
-      });
-  }
-
-  private subscribeToSearchService(): void {
-    this.searchService.search$.subscribe((query) => {
-      this.onSearch(query);
+    this.transactionService.transactions$.subscribe((data) => {
+      this.dataSource = data
+      this.recentTransactions = data.filter(
+        (e) =>
+          e.createdAt.toDate() >= startOfDay(new Date()) &&
+          e.cashierID == this._users?.id
+      );
     });
   }
 
@@ -105,9 +81,6 @@ export class TransactionsComponent implements OnInit {
           transaction.orderList.some((orderItem) =>
             orderItem.quantity.toString().includes(lowerCaseQuery)
           ) ||
-          //transaction.orderList.some((orderItem) =>
-          //orderItem.customerName.toLowerCase().includes(lowerCaseQuery)
-          //) ||
           transaction.orderList.some((orderItem) =>
             orderItem.quantity.toString().includes(lowerCaseQuery)
           ) ||
@@ -116,10 +89,8 @@ export class TransactionsComponent implements OnInit {
             .includes(lowerCaseQuery)
         );
       });
-
       this.dataSource = filteredData;
     }
-
     this.recentTransactions = this.getTransactionsMadeToday();
   }
 
@@ -143,18 +114,6 @@ export class TransactionsComponent implements OnInit {
     return orderList.some((orderItem) => orderItem.productName.includes(query));
   }
 
-  // Public method to get user information based on user ID
-  getUserInfo(uid: string): void {
-    this.authService.getUserAccount(uid).then((value) => {
-      console.log(value);
-      if (value.exists()) {
-        const users: Users = value.data();
-        // Set the cashier name to be used in the template
-        this._users = users;
-      }
-    });
-  }
-
   getCurrentDate(): Date {
     return new Date();
   }
@@ -174,7 +133,6 @@ export class TransactionsComponent implements OnInit {
   // Public method to filter transactions made today
   getTransactionsMadeToday(): Transactions[] {
     const currentDate = new Date();
-
     return this._transactionList.filter((transaction) => {
       const transactionDate = transaction.createdAt.toDate();
 
@@ -190,7 +148,6 @@ export class TransactionsComponent implements OnInit {
   exportToExcel(): void {
     const cashierName = this._users ? this._users.name : 'Unknown Cashier';
     const companyInfo = this.companyInfoService;
-
     ExcelExportService.exportToExcel(
       this.dataSource,
       'transactions-report',

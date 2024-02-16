@@ -53,6 +53,7 @@ export class ConfirmCheckoutComponent {
     let transaction: Transactions = {
       id: '',
       customerID: '',
+      driverID: '',
       cashierID: this.users?.id ?? '',
       type: TransactionType.WALK_IN,
       orderList: items,

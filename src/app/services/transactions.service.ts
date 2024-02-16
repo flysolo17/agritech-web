@@ -62,6 +62,28 @@ export class TransactionsService {
     );
     return collectionData(q) as Observable<Transactions[]>;
   }
+
+  acceptTransaction(
+    employeeID: string,
+    transactionID: string,
+    status: TransactionStatus,
+    details: TrasactionDetails,
+    payment: Payment
+  ) {
+    const transactionRef = doc(
+      this.firestore,
+      this._collection_name,
+      transactionID
+    );
+
+    const updatedData = {
+      cashierID: employeeID,
+      status: status,
+      details: arrayUnion(details),
+      payment: payment,
+    };
+    return updateDoc(transactionRef, updatedData);
+  }
   updateTransactionStatus(
     transactionID: string,
     status: TransactionStatus,
@@ -110,7 +132,7 @@ export class TransactionsService {
     return updateDoc(
       doc(this.firestore, this._collection_name, transactionID),
       {
-        cashierID: uid,
+        driverID: uid,
       }
     );
   }

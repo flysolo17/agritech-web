@@ -15,6 +15,7 @@ import { Address } from '../user_address';
 export interface Transactions {
   id: string;
   cashierID: string;
+  driverID: string;
   customerID: string;
   type: TransactionType;
   orderList: OrderItems[];

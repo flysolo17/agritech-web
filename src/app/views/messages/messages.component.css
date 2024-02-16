@@ -1,41 +1,36 @@
-.m-container {
+.card-body {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.card-body .customer-container .convo-container {
   height: 100%;
 }
-.m-container-1 {
-  width: 30%;
+
+.customer-container {
   display: flex;
+  overflow-y: auto; /* Change to auto to only show scrollbar when needed */
   flex-direction: column;
+  max-height: 80vh; /* Set a maximum height */
 }
 
-.m-container-2 {
-  flex-grow: 1;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.li:hover {
+  cursor: pointer;
 }
-
-/* 
-user list */
-.customer-message {
-  display: flex;
-  gap: 5px;
-  padding: 5px;
-  align-items: center;
-  justify-content: center;
-}
-.customer-message:hover {
-  background-color: aliceblue;
-  border-radius: 10px;
-}
-
-/* 
-convo */
-
 .convo-container {
-  height: 100%;
-  width: 100%;
   display: flex;
+  height: 100%;
+
   flex-direction: column;
+  justify-content: space-between;
+}
+
+.admin-message {
+  background-color: red;
+}
+
+.user-message {
+  background-color: blue;
 }
