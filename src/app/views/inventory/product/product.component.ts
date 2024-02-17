@@ -34,6 +34,11 @@ export class ProductComponent implements OnInit {
 
   filteredProducts: Products[] = [];
   filter: string = '';
+
+  page = 1;
+  pageSize = 10;
+  collectionSize = 0;
+
   constructor(
     private productService: ProductService,
     public dateService: DateConverterService,
@@ -46,6 +51,7 @@ export class ProductComponent implements OnInit {
   ) {
     this.productService.getAllProducts().subscribe((data: Products[]) => {
       this._PRODUCTS = data;
+      this.collectionSize = data.length;
       this.filteredProducts = data;
       this.productCalculator = new ProductCalculator(this._PRODUCTS);
     });
@@ -208,5 +214,12 @@ export class ProductComponent implements OnInit {
     } else {
       return 'Expired';
     }
+  }
+
+  refreshProducts() {
+    this.filteredProducts = this._PRODUCTS.slice(
+      (this.page - 1) * this.pageSize,
+      (this.page - 1) * this.pageSize + this.pageSize
+    );
   }
 }

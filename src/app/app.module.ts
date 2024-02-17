@@ -61,7 +61,13 @@ import { EditCmsComponent } from './components/edit-cms/edit-cms.component';
 import { ViewCustomerProfileComponent } from './views/admin/view-customer-profile/view-customer-profile.component';
 import { SettingsComponent } from './views/admin/settings/settings.component';
 import { AddTargetSalesComponent } from './components/add-target-sales/add-target-sales.component';
-
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NewsletterDialogComponent } from './components/newsletter-dialog/newsletter-dialog.component';
+import {
+  NgbPaginationModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   declarations: [
     AppComponent,
@@ -111,11 +117,13 @@ import { AddTargetSalesComponent } from './components/add-target-sales/add-targe
     ViewCustomerProfileComponent,
     SettingsComponent,
     AddTargetSalesComponent,
+    NewsletterDialogComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
     FormsModule,
+    NgbPaginationModule,
     NgxJsonViewerModule,
     NgxDaterangepickerMd.forRoot(),
     NgChartsModule.forRoot({ defaults: {} }),
@@ -126,6 +134,7 @@ import { AddTargetSalesComponent } from './components/add-target-sales/add-targe
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),
     ToastrModule.forRoot(),
+    NgbModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

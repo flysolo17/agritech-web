@@ -1,10 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PaymentQr } from 'src/app/models/payments-qr';
 import { TargetSales } from 'src/app/models/sales/target-sales';
 import { PaymentService } from 'src/app/services/payment.service';
 import { TargetSalesService } from 'src/app/services/target-sales.service';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NewsletterDialogComponent } from 'src/app/components/newsletter-dialog/newsletter-dialog.component';
+import { NewsletterService } from 'src/app/services/newsletter.service';
+import { NewsLetter } from 'src/app/models/newsletter';
+import '@angular/localize/init';
 
 @Component({
   selector: 'app-settings',
@@ -15,32 +20,45 @@ export class SettingsComponent implements OnDestroy {
   selectedDate: string = new Date().getFullYear().toString();
   targetSales: TargetSales[] = [];
   paymentQrs: PaymentQr[] = [];
-  private paymentQrsSubscription: Subscription;
+  newsletters$: NewsLetter[] = [];
+  // private paymentQrsSubscription: Subscription;
+  private modalService = inject(NgbModal);
+  selectedNewsletters: string[] = [];
+
+  allNewsLetters$: NewsLetter[] = [];
+
+  page = 1;
+  pageSize = 10;
+  newsLetterSize = 0;
 
   constructor(
     private targetSalesService: TargetSalesService,
     private toastr: ToastrService,
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private newsLetterService: NewsletterService
   ) {
-    this.getTargetSalesByYear(this.selectedDate);
-    this.paymentQrsSubscription = paymentService
-      .getAllPaymentQr()
-      .subscribe((data) => {
-        this.paymentQrs = data;
-      });
+    newsLetterService.getAllNewsLetter().subscribe((data) => {
+      this.newsletters$ = data;
+      this.allNewsLetters$ = data;
+      this.newsLetterSize = data.length;
+    });
+    // this.getTargetSalesByYear(this.selectedDate);
+    // this.paymentQrsSubscription = paymentService
+    //   .getAllPaymentQr()
+    //   .subscribe((data) => {
+    //     this.paymentQrs = data;
+    //   });
   }
 
   ngOnDestroy(): void {
-    if (this.paymentQrsSubscription) {
-      this.paymentQrsSubscription.unsubscribe();
-    }
+    // if (this.paymentQrsSubscription) {
+    //   this.paymentQrsSubscription.unsubscribe();
+    // }
   }
 
-  // loginUser() {
-  //   this.loadPaymentQrs();
-  //   this.getTargetSalesByYear(this.selectedDate);
-  // }
-
+  createNewsletterModal() {
+    this.modalService.open(NewsletterDialogComponent);
+  }
   getTargetSalesByYear(year: string) {
     this.targetSalesService.getAllTargetSales(year).subscribe(
       (data) => {
@@ -102,5 +120,21 @@ export class SettingsComponent implements OnDestroy {
         }
       );
     }
+  }
+
+  isChecked = false;
+  isIndeterminate = false;
+
+  onCheckboxChange(event: any) {
+    // Handle checkbox change here
+    console.log('Checkbox checked:', event.target.checked);
+    console.log('Indeterminate:', this.isIndeterminate);
+  }
+
+  refreshNewsletters() {
+    this.newsletters$ = this.allNewsLetters$.slice(
+      (this.page - 1) * this.pageSize,
+      (this.page - 1) * this.pageSize + this.pageSize
+    );
   }
 }

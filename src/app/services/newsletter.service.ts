@@ -13,14 +13,27 @@ import {
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { collectionData } from 'rxfire/firestore';
-
+import {
+  Storage,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from '@angular/fire/storage';
+import { v4 as uuidv4 } from 'uuid';
 const NEWSLETTER_COLLECTION = 'newsletters';
 @Injectable({
   providedIn: 'root',
 })
 export class NewsletterService {
-  constructor(private firestore: Firestore) {}
-  addNewsletter(newsLetter: NewsLetter) {
+  constructor(private firestore: Firestore, private storage: Storage) {}
+  async saveNewsletter(newsLetter: NewsLetter, file: File | null) {
+    if (file !== null) {
+      const fireRef = ref(this.storage, `${NEWSLETTER_COLLECTION}/${uuidv4()}`);
+
+      await uploadBytes(fireRef, file);
+      const downloadURL = await getDownloadURL(fireRef);
+      newsLetter.image = downloadURL;
+    }
     return setDoc(
       doc(this.firestore, NEWSLETTER_COLLECTION, newsLetter.id).withConverter(
         newsletterConverter
