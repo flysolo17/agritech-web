@@ -33,3 +33,20 @@ table th {
 h6 {
   font-weight: bold;
 }
+
+/* added code */
+.categ-count {
+  border-left: 25px solid #5474c4;
+}
+
+.product-count {
+  border-left: 25px solid #91cc75;
+}
+
+.plus-sign {
+  color: #91cc75;
+}
+
+.stock-count {
+  border-left: 25px solid #ec6464;
+}

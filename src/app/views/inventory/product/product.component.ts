@@ -19,6 +19,8 @@ import { PdfExportService } from 'src/app/services/reportgen/product/pdf-export.
 import { formatPrice } from 'src/app/utils/constants';
 import { ProductCalculator } from 'src/app/utils/product_calc';
 
+import * as echarts from 'echarts'; // added ECharts run on terminal "npm install echarts --save"
+
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
@@ -49,69 +51,161 @@ export class ProductComponent implements OnInit {
     private pdfExportService: PdfExportService,
     private excelExportService: ExcelExportService
   ) {
-    this.productService.getAllProducts().subscribe((data: Products[]) => {
-      this._PRODUCTS = data;
-      this.collectionSize = data.length;
-      this.filteredProducts = data;
-      this.productCalculator = new ProductCalculator(this._PRODUCTS);
-    });
+    // refactor code
+    this.initializeProducts();
     this.productCalculator = new ProductCalculator([]);
     authService.users$.subscribe((data) => {
       this.users$ = data;
     });
   }
 
+  private initializeProducts(): void {
+    this.productService.getAllProducts().subscribe((data: Products[]) => {
+      this.productService.setProduct(data);
+      this._PRODUCTS = data;
+      this.collectionSize = data.length;
+      this.filteredProducts = data;
+      this.productCalculator = new ProductCalculator(this._PRODUCTS);
+
+      this.renderProductAvailabilityChart();
+      this.renderProductCategoryQuantity();
+    });
+  }
+  computeStocksPerCategory(category: string): number {
+    const totalStocks = this._PRODUCTS
+      .filter((product) => product.category.toLocaleLowerCase() === category)
+      .reduce((sum, product) => sum + product.stocks, 0);
+
+    return totalStocks;
+  }
+
+  renderProductCategoryQuantity() {
+    const chartElement = document.getElementById('category-stocks');
+    const chart = echarts.init(chartElement);
+
+    const categories = Array.from(
+      new Set(this._PRODUCTS.map((e) => e.category))
+    );
+    const quantities = categories.map((category) =>
+      this.computeStocksPerCategory(category)
+    );
+
+    const option = {
+      title: {
+        text: '',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
+      },
+      legend: {
+        orient: 'horizontal',
+        bottom: 'bottom',
+        data: ['Stocks'],
+      },
+      xAxis: {
+        type: 'category',
+        data: categories,
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          name: 'Stocks',
+          type: 'bar',
+          data: quantities,
+
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2,
+          },
+          label: {
+            show: false,
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    };
+    chart.setOption(option);
+  }
+
+  private sortFilteredProducts(): void {
+    this.filteredProducts.sort(
+      (a, b) =>
+        (b.updatedAt || b.createdAt).getTime() -
+        (a.updatedAt || a.createdAt).getTime()
+    );
+  }
+  //end of refactor
+
   ngOnInit(): void {}
 
-  // Function to handle filter change
   applyFilter(selectedFilter: string) {
     this.filter = selectedFilter;
     this.filterProducts();
   }
 
-  // Function to filter products based on the selected filter
+  // updated code - Joery
   filterProducts() {
     this.filteredProducts = [...this._PRODUCTS];
-
     switch (this.filter) {
-      case 'alphabetical':
-        this.filteredProducts.sort((a, b) =>
-          a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })
-        );
-        break;
-
-      case 'lowQuantity':
+      case 'inStock':
+        this.filteredProducts = this.filteredProducts
+          .filter((product) => this.countStocks(product) > 20)
+          .filter(
+            (product) => product.expiryDate.getTime() > new Date().getTime()
+          );
         this.filteredProducts.sort(
           (a, b) => this.countStocks(a) - this.countStocks(b)
         );
-        this.filteredProducts = this.filteredProducts.filter(
-          (product) =>
-            this.countStocks(product) >= 0 && this.countStocks(product) < 20
-        );
         break;
-
-      case 'dateModified':
+      case 'lowStock':
+        this.filteredProducts = this.filteredProducts
+          .filter(
+            (product) =>
+              this.countStocks(product) >= 1 && this.countStocks(product) < 20
+          )
+          .filter(
+            (product) => product.expiryDate.getTime() > new Date().getTime()
+          );
         this.filteredProducts.sort(
-          (a, b) =>
-            (b.updatedAt || b.createdAt).getTime() -
-            (a.updatedAt || a.createdAt).getTime()
+          (a, b) => this.countStocks(a) - this.countStocks(b)
         );
         break;
-
-      case 'expirationDate':
+      case 'outOfStock':
+        this.filteredProducts = this.filteredProducts.filter(
+          (product) => this.countStocks(product) === 0
+        );
+        break;
+      case 'toBeExpired':
         const currentDate = new Date();
+        const thresholdDate = new Date(
+          currentDate.getTime() + 60 * 24 * 60 * 60 * 1000
+        ); // 60 days
         this.filteredProducts = this.filteredProducts.filter(
           (product) =>
-            product.expiryDate.getTime() <=
-            currentDate.getTime() + 30 * 24 * 60 * 60 * 1000
-        );
-        this.filteredProducts.sort(
-          (a, b) => a.expiryDate.getTime() - b.expiryDate.getTime()
+            product.expiryDate.getTime() <= thresholdDate.getTime() &&
+            product.expiryDate.getTime() >= currentDate.getTime()
         );
         break;
-
+      case 'expired':
+        const currentdate = new Date();
+        this.filteredProducts = this.filteredProducts.filter(
+          (product) => product.expiryDate.getTime() < currentdate.getTime()
+        );
+        break;
       default:
-        // Handle default case or do nothing
         break;
     }
   }
@@ -195,15 +289,15 @@ export class ProductComponent implements OnInit {
 
   displayExpiryDate(expiryDate: Date): string {
     const currentDate = new Date();
-    const oneWeek = 7 * 24 * 60 * 60 * 1000; // One week in milliseconds
+    const oneWeek = 60 * 24 * 60 * 60 * 1000; // 2months or 60 days instead of 1 week
 
     if (expiryDate.getTime() >= currentDate.getTime()) {
       const timeDiff = expiryDate.getTime() - currentDate.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
       if (daysDiff <= 0) {
-        return 'Expired';
-      } else if (daysDiff <= 7) {
+        return 'Exceeded';
+      } else if (daysDiff <= 60) {
         return `${daysDiff} day${daysDiff === 1 ? '' : 's'} left`;
       } else {
         const month = expiryDate.getMonth() + 1;
@@ -212,7 +306,7 @@ export class ProductComponent implements OnInit {
         return `${month}/${day}/${year}`;
       }
     } else {
-      return 'Expired';
+      return 'Exceeded';
     }
   }
 
@@ -221,5 +315,86 @@ export class ProductComponent implements OnInit {
       (this.page - 1) * this.pageSize,
       (this.page - 1) * this.pageSize + this.pageSize
     );
+  }
+
+  //added codes
+  isExpired(product: Products) {
+    const currentDate: Date = new Date();
+    return product.expiryDate.getTime() < currentDate.getTime();
+  }
+
+  isToBeExpired(product: any): boolean {
+    const currentDate = new Date();
+    const thresholdDate = new Date(
+      currentDate.getTime() + 60 * 24 * 60 * 60 * 1000
+    ); // 60 days from now
+    return (
+      product.expiryDate.getTime() <= thresholdDate.getTime() &&
+      product.expiryDate.getTime() >= currentDate.getTime()
+    );
+  }
+
+  // added chart product availability
+  renderProductAvailabilityChart(): void {
+    const chartElement = document.getElementById('product-availability');
+    const chart = echarts.init(chartElement);
+
+    const categories = [
+      'In stock',
+      'Low in stock',
+      'Out of stock',
+      'To expire',
+      'Expired',
+    ];
+    const quantities = [
+      this.productCalculator.countInStockProducts(),
+      this.productCalculator.countProductsLessThan20(),
+      this.productCalculator.countProductsNoStocks(),
+      this.productCalculator.countToBeExpiredProducts(),
+      this.productCalculator.countExpiredProducts(),
+    ];
+
+    const option = {
+      title: {
+        text: '',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'item',
+      },
+      legend: {
+        orient: 'horizontal',
+        bottom: 'bottom',
+        data: categories,
+      },
+      series: [
+        {
+          name: 'Availability',
+          type: 'pie',
+          radius: ['25%', '80%'],
+          center: ['50%', '50%'],
+          data: categories.map((category, index) => ({
+            value: quantities[index],
+            name: category,
+          })),
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2,
+          },
+          label: {
+            show: false,
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    };
+    chart.setOption(option);
   }
 }

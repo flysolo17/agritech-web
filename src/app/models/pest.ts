@@ -1,31 +1,36 @@
-import { Timestamp } from '@angular/fire/firestore';
+import { QueryDocumentSnapshot } from '@angular/fire/firestore';
+
+export enum Topic {
+  CORN = 'CORN',
+  VEGETABLE = 'VEGETABLE',
+  RICE = 'RICE',
+}
 
 export interface PestMap {
   id: string;
-  title: string;
-  image: string;
-  topic: Topic[];
-  createdAt: Timestamp;
-}
-
-export interface Topic {
+  topic: Topic;
   title: string;
   desc: string;
   image: string;
   category: string;
   contents: Contents[];
-  comments: Comments[];
   recomendations: string[];
+  createdAt: Date;
 }
+
+export const pestMapConverter = {
+  toFirestore: (data: PestMap) => data,
+  fromFirestore: (snap: QueryDocumentSnapshot) => {
+    const data = snap.data();
+    return {
+      ...data,
+      createdAt: data['createdAt'].toDate(),
+    } as PestMap;
+  },
+};
 
 export interface Contents {
   title: string;
   description: string;
   image: string;
-}
-
-export interface Comments {
-  userID: string;
-  isAgritechEmployee: boolean;
-  comment: string;
 }

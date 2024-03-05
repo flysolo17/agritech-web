@@ -63,7 +63,7 @@ export class TransactionCalculator {
     const topSellingStocks: TopSellingStock[] = Array.from(
       topSellingStockMap.values()
     ).sort((a, b) => b.soldQuantity - a.soldQuantity);
-    const top3SellingStocks = topSellingStocks.slice(0, 3);
+    const top3SellingStocks = topSellingStocks.slice(0, 5); // top 5 nalang
     return top3SellingStocks;
   }
 
@@ -369,4 +369,72 @@ export class TransactionCalculator {
 
   //   return [totalSalesPerMonth, totalCostPerMonth];
   // }
+
+  // Start Added Method
+  getFastMovingProducts(): {
+    productName: string;
+    quantitySold: number;
+    totalSales: number;
+  }[] {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+
+    const productsSold = new Map<
+      string,
+      { quantitySold: number; totalSales: number }
+    >();
+
+    const filteredTransactions = this.transactions.filter((transaction) => {
+      const transactionDate = transaction.createdAt.toDate();
+      return (
+        transactionDate.getFullYear() === currentYear &&
+        transactionDate.getMonth() === currentMonth
+      );
+    });
+
+    filteredTransactions.forEach((transaction) => {
+      transaction.orderList.forEach((orderItem) => {
+        console.log('Quantity sold:', orderItem.quantity);
+        const productId = orderItem.productID;
+        const productPrice = orderItem.price;
+        let productQuantitySold = orderItem.quantity;
+
+        const totalSales = productPrice * productQuantitySold;
+
+        if (productsSold.has(productId)) {
+          const existingProduct = productsSold.get(productId)!;
+          productsSold.set(productId, {
+            quantitySold: existingProduct.quantitySold + productQuantitySold,
+            totalSales: existingProduct.totalSales + totalSales,
+          });
+        } else {
+          productsSold.set(productId, {
+            quantitySold: productQuantitySold,
+            totalSales,
+          });
+        }
+      });
+    });
+
+    const sortedProducts = Array.from(productsSold.entries()).sort(
+      (a, b) => b[1].quantitySold - a[1].quantitySold
+    );
+
+    const topFastMovingProducts = sortedProducts
+      .slice(0, 5)
+      .map(([productId, { quantitySold, totalSales }]) => {
+        const parsedQuantitySold = quantitySold.toFixed(0);
+
+        const orderItem = filteredTransactions
+          .flatMap((transaction) => transaction.orderList)
+          .find((item) => item.productID === productId);
+
+        const productName = orderItem?.productName ?? '';
+        return { productName, quantitySold, totalSales };
+      });
+
+    return topFastMovingProducts;
+  }
+  //END
 }

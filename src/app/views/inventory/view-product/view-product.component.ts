@@ -5,10 +5,13 @@ import {
   Component,
   Input,
   OnInit,
+  inject,
 } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { DeleteProductDialogComponent } from 'src/app/components/delete-product-dialog/delete-product-dialog.component';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { Products } from 'src/app/models/products';
 import { UserType } from 'src/app/models/user-type';
@@ -23,9 +26,8 @@ declare var window: any;
   templateUrl: './view-product.component.html',
   styleUrls: ['./view-product.component.css'],
 })
-export class ViewProductComponent implements OnInit, AfterViewInit {
+export class ViewProductComponent implements OnInit {
   _product: Products | null = null;
-  deleteProductModal: any;
   users$: Users | null = null;
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -42,16 +44,23 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
       this.users$ = data;
     });
   }
-  ngAfterViewInit(): void {
-    this.deleteProductModal = new window.bootstrap.Modal(
-      document.getElementById('deleteProductModal')
-    );
+  private modalService = inject(NgbModal);
+  showDeleteProduct(product: Products) {
+    const modalRef = this.modalService.open(DeleteProductDialogComponent);
+    modalRef.componentInstance.product = product;
+    modalRef.result.then((data: string) => {
+      if (data !== 'confirm') {
+        this.toastr.error('Failed deletion');
+      } else {
+        this.deleteProduct(product);
+      }
+    });
   }
+
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
       const products = params['product'];
       this._product = JSON.parse(products);
-
       this.cdr.detectChanges();
     });
   }
@@ -70,8 +79,6 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
           details: 'deleting product from inventory',
           timestamp: Timestamp.now(),
         });
-
-        this.deleteProductModal.hide();
         this.loadingService.hideLoading('deleting');
         this.toastr.success(
           `${data.name} deleted successfully!`,
@@ -81,6 +88,9 @@ export class ViewProductComponent implements OnInit, AfterViewInit {
 
       error: (v) => {
         this.toastr.error(v.message, 'Error Deleting product');
+      },
+      complete: () => {
+        this.location.back();
       },
     });
   }

@@ -1,5 +1,11 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -17,6 +23,8 @@ import {
   convertTimestampToDate,
   formatTimestamp,
 } from 'src/app/utils/constants';
+import { AddVariationComponent } from '../add-variation/add-variation.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 declare var window: any;
 @Component({
   selector: 'app-edit-product',
@@ -26,7 +34,6 @@ declare var window: any;
 export class EditProductComponent implements OnInit {
   _default: Products | null = null;
   product: Products | null = null;
-  createVariationModal: any;
   _imageURL: string[] = [];
   _selectedFiles: File[] = [];
   variationList$: Variation[] = [];
@@ -61,9 +68,6 @@ export class EditProductComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-    this.createVariationModal = new window.bootstrap.Modal(
-      document.getElementById('addvariation')
-    );
     this.activatedRoute.queryParams.subscribe((params) => {
       const products = params['product'];
       this.product = JSON.parse(products);
@@ -95,6 +99,18 @@ export class EditProductComponent implements OnInit {
 
       this.cdr.detectChanges();
     });
+  }
+
+  private modalService = inject(NgbModal);
+  addVariation() {
+    const modalRef = this.modalService.open(AddVariationComponent);
+    modalRef.componentInstance.productID = this.product?.id;
+    modalRef.componentInstance.variations = this.variationList$;
+    modalRef.result
+      .then((data: Variation) => {
+        this.saveVariation(data);
+      })
+      .catch((err) => this.toastr.error(err.toString()));
   }
 
   onSubmitProduct() {
@@ -140,12 +156,18 @@ export class EditProductComponent implements OnInit {
     reader.readAsDataURL(file);
   }
   deleteImage(index: number, url: string) {
-    this.productService.deleteImage(url).then(() => {
-      if (index >= 0 && index < this._imageURL.length) {
-        this._imageURL.splice(index, 1);
-        this._selectedFiles.splice(index, 1);
-      }
-    });
+    this.productService
+      .deleteImage(url)
+      .then(() => {
+        this.toastr.success('Successfully Deleted!');
+        if (index >= 0 && index < this._imageURL.length) {
+          this._imageURL.splice(index, 1);
+          this._selectedFiles.splice(index, 1);
+        }
+      })
+      .catch((err) => {
+        this.toastr.error(err.toString());
+      });
   }
 
   deleteVariation(index: number) {
@@ -207,7 +229,6 @@ export class EditProductComponent implements OnInit {
   }
   saveVariation(data: Variation) {
     this.product?.variations.push(data);
-    this.createVariationModal.hide();
     let cost = this.productForm.controls['cost'].value ?? 0;
     let price = this.productForm.controls['price'].value ?? 0;
     let stocks = this.productForm.controls['stocks'].value ?? 0;

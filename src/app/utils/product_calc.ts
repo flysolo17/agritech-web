@@ -71,6 +71,7 @@ export class ProductCalculator {
     });
     return totalSales;
   }
+
   getTotalPriceLast7Days(): number {
     const currentDate = new Date();
     const sevenDaysAgo = new Date(currentDate);
@@ -133,4 +134,81 @@ export class ProductCalculator {
       return count;
     }, 0);
   }
+
+  // Added Method
+  getCountOfProductsLast7Days(): number {
+    const currentDate = new Date();
+    const sevenDaysAgo = new Date(currentDate);
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+
+    let totalCount = 0;
+
+    this.products.forEach((product) => {
+      if (
+        product.createdAt >= sevenDaysAgo &&
+        product.createdAt <= currentDate
+      ) {
+        totalCount++;
+      }
+    });
+
+    return totalCount;
+  }
+
+  countInStockProducts(): number {
+    const currentDate = new Date();
+    return this.products.reduce((count, product) => {
+      if (product.variations.length === 0) {
+        if (
+          product.stocks > 20 &&
+          product.expiryDate.getTime() > currentDate.getTime()
+        ) {
+          count++;
+        }
+      } else {
+        const variationStocks = product.variations.reduce(
+          (total, variation) => total + variation.stocks,
+          0
+        );
+        if (
+          variationStocks > 20 &&
+          product.expiryDate.getTime() > currentDate.getTime()
+        ) {
+          count++;
+        }
+      }
+      return count;
+    }, 0);
+  }
+
+  countToBeExpiredProducts(): number {
+    const currentDate = new Date();
+    const sixtyDaysLater = new Date(
+      currentDate.getTime() + 60 * 24 * 60 * 60 * 1000
+    ); // 60 days from now
+    return this.products.reduce((count, product) => {
+      if (product.expiryDate) {
+        const expirationDate = new Date(product.expiryDate);
+        if (expirationDate <= sixtyDaysLater && expirationDate > currentDate) {
+          count++;
+        }
+      }
+      return count;
+    }, 0);
+  }
+
+  countExpiredProducts(): number {
+    const currentDate = new Date();
+
+    return this.products.reduce((count, product) => {
+      if (product.expiryDate) {
+        const expirationDate = new Date(product.expiryDate);
+        if (expirationDate < currentDate) {
+          count++;
+        }
+      }
+      return count;
+    }, 0);
+  }
+  // END of added Method
 }

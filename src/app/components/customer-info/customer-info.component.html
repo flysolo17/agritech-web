@@ -1,6 +1,8 @@
 <div class="d-flex gap-2 align-items-center">
   <img
-    [src]="customerProfile()"
+    [src]="
+      customer?.profile || '../../../assets/images/profile_placeholder.jpg'
+    "
     alt="Profile Image"
     class="img-fluid rounded-circle"
     style="height: 40px; width: 40px"

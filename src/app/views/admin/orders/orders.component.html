@@ -362,14 +362,14 @@
               <td>
                 <div class="d-flex gap-2">
                   <button
-                    *ngIf="transactions.cashierID === ''"
+                    *ngIf="transactions.driverID === ''"
                     class="btn btn-danger"
-                    (click)="selectTransaction(transactions)"
+                    (click)="addDriver(transactions)"
                   >
                     Add Driver
                   </button>
                   <button
-                    *ngIf="transactions.cashierID !== ''"
+                    *ngIf="transactions.driverID !== ''"
                     (click)="
                       ongoingDeliver(transactions.id, transactions.payment)
                     "
@@ -630,7 +630,7 @@
                   <button
                     *ngIf="!isPaid(transactions.payment)"
                     class="btn btn-outline-secondary"
-                    (click)="selectTransactionForPayment(transactions)"
+                    (click)="selectTransactionToAddPayment(transactions)"
                   >
                     ADD PAYMENT
                   </button>
@@ -649,9 +649,3 @@
     </div>
   </div>
 </div>
-
-<app-add-driver (onSelectDriver)="isDriverSelected($event)"></app-add-driver>
-<app-add-payment
-  (confirmOrder)="addPayment($event)"
-  [transaction]="selectedTransaction!"
-></app-add-payment>

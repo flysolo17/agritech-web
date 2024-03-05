@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Toast } from 'bootstrap';
 import { Order } from 'src/app/models/products';
 import {
@@ -28,7 +29,7 @@ import { computeSubTotal, formatPrice } from 'src/app/utils/constants';
 export class ConfirmCheckoutComponent {
   @Input() users: Users | null = null;
   @Input() orders: Order[] = [];
-  @Output() confirmOrder = new EventEmitter<Transactions>();
+  activeModal = inject(NgbActiveModal);
   cashReceived: number = 0;
   constructor(public loadingService: LoadingService) {}
   submit(cash: number) {
@@ -68,7 +69,7 @@ export class ConfirmCheckoutComponent {
       details: [details],
       createdAt: Timestamp.now(),
     };
-    this.confirmOrder.emit(transaction);
+    this.activeModal.close(transaction);
   }
   subtotal(orders: Order[]): number {
     return computeSubTotal(orders);

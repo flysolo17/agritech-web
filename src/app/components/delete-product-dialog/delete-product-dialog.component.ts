@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Products } from 'src/app/models/products';
 import { LoadingService } from 'src/app/services/loading.service';
 
@@ -10,14 +11,14 @@ import { LoadingService } from 'src/app/services/loading.service';
 export class DeleteProductDialogComponent {
   @Input() product?: Products;
   confirm: string = '';
-  @Output() onSubmit = new EventEmitter<Products>();
+  activeModal = inject(NgbActiveModal);
   constructor(public loadingService: LoadingService) {}
   onChange(event: any) {
     this.confirm = event.target.value;
   }
   confirmDelete() {
     if (this.product !== null) {
-      this.onSubmit.emit(this.product);
+      this.activeModal.close(this.confirm);
     }
   }
 }

@@ -1,7 +1,16 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Contents, Topic } from 'src/app/models/pest';
+import { Contents, PestMap, Topic } from 'src/app/models/pest';
 import { Products } from 'src/app/models/products';
 import { LoadingService } from 'src/app/services/loading.service';
 import { PestService } from 'src/app/services/pest.service';
@@ -13,13 +22,9 @@ import { findProductById } from 'src/app/utils/constants';
   templateUrl: './edit-cms.component.html',
   styleUrls: ['./edit-cms.component.css'],
 })
-export class EditCmsComponent {
-  @Input() pestID: string = '';
-  @Input() topic: Topic | null = null;
-  @Output() pestEvent = new EventEmitter<any>();
-
-  
-  _contentList: Contents[] = this.topic?.contents ?? [];
+export class EditCmsComponent implements OnInit {
+  @Input() pest!: PestMap;
+  _contentList: Contents[] = [];
   _contentFile: File | null = null;
   _contentForm = new FormGroup({
     title: new FormControl('', Validators.required),
@@ -30,24 +35,33 @@ export class EditCmsComponent {
 
   _products: Products[] = [];
   _topicForm = new FormGroup({
-    title: new FormControl(this.topic?.title ?? '', Validators.required),
-    description: new FormControl(this.topic?.desc ?? ''),
-    category: new FormControl(
-      this.topic?.category ?? 'INSECTS',
-      Validators.required
-    ),
-    image: new FormControl(this.topic?.image ?? '', Validators.required),
+    title: new FormControl('', Validators.required),
+    description: new FormControl(''),
+    category: new FormControl('INSECTS', Validators.required),
+    image: new FormControl(''),
   });
+  activeModal = inject(NgbActiveModal);
   constructor(
     private pestMapService: PestService,
     public loadingService: LoadingService,
     private toatr: ToastrService,
     private productService: ProductService
   ) {}
+
   ngOnInit(): void {
     this.productService.getAllProducts().subscribe((data) => {
       this._products = data;
+      data.forEach((e) => {
+        if (this.pest.recomendations.includes(e.id)) {
+          this._recomendations.push(e);
+        }
+      });
     });
+    this._contentList = this.pest.contents;
+
+    this._topicForm.controls.title.setValue(this.pest.title);
+    this._topicForm.controls.description.setValue(this.pest.desc);
+    this._topicForm.controls.category.setValue(this.pest.category);
   }
 
   onSelectTopicFile(event: any) {
@@ -82,43 +96,33 @@ export class EditCmsComponent {
 
   addRecomendations(value: string) {
     let product: Products | null = findProductById(this._products, value);
-    if (product !== null && !this._recomendations.includes(product))
+
+    if (product !== null && !this._recomendations.includes(product)) {
       this._recomendations.push(product);
+    }
   }
 
   async genearateTopic() {
     this.loadingService.showLoading('update-topic');
-    let topic: Topic = {
-      title: this._topicForm.controls.title.value ?? '',
-      desc: this._topicForm.controls.description.value ?? '',
-      image: '',
-      category: this._topicForm.controls.category.value ?? '',
-      contents: this._contentList,
-      comments: [],
-      recomendations: this._recomendations.map((e) => e.id),
-    };
-    if (this._topicFile !== null) {
-      const result = await this.pestMapService.uploadPestImage(this._topicFile);
-      topic.image = result;
-    }
-    this.saveTopic(topic);
+    (this.pest.title = this._topicForm.controls.title.value ?? ''),
+      (this.pest.desc = this._topicForm.controls.description.value ?? ''),
+      (this.pest.category = this._topicForm.controls.category.value ?? ''),
+      this.updatePest(this.pest);
   }
-  saveTopic(topic: Topic) {
+  updatePest(pest: PestMap) {
     this.loadingService.showLoading('update-topic');
     this.pestMapService
-      .addPestMapTopic(this.pestID, topic)
+      .updatePestMap(this._topicFile, pest)
       .then(() => this.toatr.success('Successfully Added!'))
       .catch((err: any) => this.toatr.error(err.message))
       .finally(() => {
         this.loadingService.hideLoading('update-topic');
         this._topicForm.reset();
-        this._topicFile = null;
-        this.pestEvent.emit();
       });
   }
-  deleteTopic(pestID: string, topic: Topic) {
+  deleteTopic(pestID: string) {
     this.pestMapService
-      .deleteTopic(pestID, topic)
+      .deleteTopic(pestID)
       .then(() => this.toatr.success('Successfully Deleted!'))
       .catch((err) => this.toatr.error(err.toString()))
       .finally(() => this.loadingService.hideLoading('delete-topic'));

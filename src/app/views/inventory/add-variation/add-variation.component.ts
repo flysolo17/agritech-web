@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Variation } from 'src/app/models/variation';
 import { LoadingService } from 'src/app/services/loading.service';
@@ -13,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class AddVariationComponent {
   @Input() variations: Variation[] = [];
   @Input() productID!: string;
-  @Output() onSubmit = new EventEmitter<Variation>();
+  activeModal = inject(NgbActiveModal);
   selectedFile: File | null = null;
   constructor(
     private productService: ProductService,
@@ -58,9 +59,9 @@ export class AddVariationComponent {
       if (this.selectedFile !== null) {
         this.uploadImage(this.selectedFile, variation);
       } else {
-        this.onSubmit.emit(variation);
         this.variationForm.reset();
         this.loadingService.hideLoading('add-variation');
+        this.activeModal.close(variation);
       }
     }
   }
@@ -70,7 +71,7 @@ export class AddVariationComponent {
       .uploadVariationImage(this.productID, file)
       .then((data) => {
         variation.image = data;
-        this.onSubmit.emit(variation);
+        this.activeModal.close(variation);
       })
       .catch((err) => {
         this.toastr.error(err.message, 'Uploading image variation failed');

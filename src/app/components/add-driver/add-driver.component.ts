@@ -1,4 +1,12 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Users } from 'src/app/models/users';
 import { AuthService } from 'src/app/services/auth.service';
@@ -9,16 +17,20 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./add-driver.component.css'],
 })
 export class AddDriverComponent implements OnInit {
-  _drivers: Observable<Users[]>;
-  constructor(private authService: AuthService) {
-    this._drivers = new Observable<Users[]>();
-  }
+  _drivers: Users[] = [];
+  activeModal = inject(NgbActiveModal);
+  constructor(
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
   ngOnInit(): void {
-    this._drivers = this.authService.getAllDrivers();
+    this.authService.getAllDrivers().subscribe((data) => {
+      this._drivers = data;
+      this.cdr.detectChanges();
+    });
   }
-  @Output() onSelectDriver = new EventEmitter<Users>();
 
   selectDriver(data: Users) {
-    this.onSelectDriver.emit(data);
+    this.activeModal.close(data);
   }
 }

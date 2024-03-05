@@ -68,6 +68,7 @@ import {
   NgbPaginationModule,
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -125,6 +126,7 @@ import {
     FormsModule,
     NgbPaginationModule,
     NgxJsonViewerModule,
+    NgbTypeaheadModule,
     NgxDaterangepickerMd.forRoot(),
     NgChartsModule.forRoot({ defaults: {} }),
     AppRoutingModule,

@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center justify-content-between mb-2">
       <h5>{{ _product?.name }}</h5>
       <div class="d-flex gap-1">
-        <button class="btn btn-danger" (click)="deleteProductModal.show()">
+        <button class="btn btn-danger" (click)="showDeleteProduct(_product!)">
           DELETE
         </button>
         <button
@@ -123,11 +123,4 @@
       </div>
     </div>
   </div>
-</div>
-
-<div *ngIf="_product !== null">
-  <app-delete-product-dialog
-    [product]="_product"
-    (onSubmit)="deleteProduct($event)"
-  ></app-delete-product-dialog>
 </div>

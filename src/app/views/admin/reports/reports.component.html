@@ -1,163 +1,218 @@
-<div class="container-fluid p-3">
-  <div class="row">
-    <div class="col-6">
-      <div class="containers">
-        <h5>Overview</h5>
-
-        <div class="row">
-          <div class="col">
-            <h5>
-              {{
-                formatPrice(
-                  _transactionCalculator.calculateTotalSales() -
-                    _transactionCalculator.calculateTotalCost()
-                )
-              }}
-            </h5>
-            <p>Total Profit</p>
-          </div>
-
-          <div class="col">
-            <h5>
-              {{
-                formatPrice(
-                  _transactionCalculator.calculateTotalSales() -
-                    _transactionCalculator.calculateTotalCost()
-                )
-              }}
-            </h5>
-            <p class="text-warning">Revenue</p>
-          </div>
-          <div class="col">
-            <h5>
-              {{ formatPrice(_transactionCalculator.calculateTotalSales()) }}
-            </h5>
-            <p style="color: purple">Sales</p>
+<!-- Just copy and paste entire code -->
+<div class="container-fluid d-flex flex-column h-100 gap-3 p-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <div class="containers profit">
+          <div class="row">
+            <div class="col">
+              <h3>
+                <b>
+                  {{
+                    formatPrice(
+                      _transactionCalculator.calculateTotalSales() -
+                        _transactionCalculator.calculateTotalCost()
+                    )
+                  }}
+                </b>
+              </h3>
+              <h5>Total Profit</h5>
+            </div>
           </div>
         </div>
-        <hr />
-        <div class="row">
-          <div class="col">
-            <h5>
-              {{ formatPrice(_productCalculator.getTotalPurchases()) }}
-            </h5>
-            <p>Net purchase value</p>
+      </div>
+      <div class="col">
+        <div class="containers revenue">
+          <div class="row">
+            <div class="col">
+              <h3>
+                <b>
+                  {{
+                    formatPrice(
+                      _transactionCalculator.calculateTotalSales() -
+                        _transactionCalculator.calculateTotalCost()
+                    )
+                  }}
+                </b>
+              </h3>
+              <h5>Revenue</h5>
+            </div>
           </div>
-
-          <div class="col">
-            <h5>
-              {{ formatPrice(_productCalculator.getTotalSalesValue()) }}
-            </h5>
-            <p class="text-warning">Net sales value</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="containers sales">
+          <div class="row">
+            <div class="col">
+              <h3>
+                <b>
+                  {{
+                    formatPrice(_transactionCalculator.calculateTotalSales())
+                  }}
+                </b>
+              </h3>
+              <h5>Sales</h5>
+            </div>
           </div>
-          <div class="col">
-            <h5>₱ 0.00</h5>
-            <p>MoM Profit</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="containers net-purchase">
+          <div class="row">
+            <div class="col">
+              <h3>
+                <b>
+                  {{ formatPrice(_productCalculator.getTotalPurchases()) }}
+                </b>
+              </h3>
+              <h5>Net purchase</h5>
+            </div>
           </div>
-          <div class="col">
-            <h5>₱ 0.00</h5>
-            <p>YoY Profit</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="containers net-sales">
+          <div class="row">
+            <div class="col">
+              <h3>
+                <b>
+                  {{ formatPrice(_productCalculator.getTotalSalesValue()) }}
+                </b>
+              </h3>
+              <h5>Net sales</h5>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-6">
-      <div class="containers">
-        <div class="d-flex align-items-center justify-content-between">
-          <h5>Best Selling Category</h5>
-          <button type="button" class="btn btn-light text-primary">
-            See all
-          </button>
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <div class="containers bar-chart">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5><b>Sales & Revenue</b></h5>
+          </div>
+          <canvas
+            style="max-height: 400px"
+            baseChart
+            [datasets]="barChartData"
+            [labels]="barChartLabels"
+            [options]="barChartOptions"
+            [legend]="barChartLegend"
+          >
+          </canvas>
         </div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Category</th>
-
-              <th scope="col text-end">Turn Over</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="
-                let top of _transactionCalculator
-                  .getCategorySales(_transactionList, _productList)
-                  .slice(0, 3)
-              "
-            >
-              <td>{{ top.category }}</td>
-
-              <td>{{ formatPrice(top.totalSales) }}</td>
-            </tr>
-          </tbody>
-        </table>
+      </div>
+      <div class="col">
+        <div class="containers">
+          <h5><b>Fast Moving Products</b></h5>
+          <div
+            id="fastMovingProductsChart"
+            style="width: 750px; height: 400px"
+          ></div>
+        </div>
       </div>
     </div>
-    <div class="col-12">
-      <div class="containers">
-        <div class="d-flex align-items-center justify-content-between">
-          <h5>Profit & Revenue</h5>
-          <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-calendar"
-                viewBox="0 0 16 16"
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <div class="containers">
+          <h5><b>Top Selling</b></h5>
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                id="stocks-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#stocks"
+                role="tab"
+                aria-controls="stocks"
+                aria-selected="true"
+                >Stocks</a
               >
-                <path
-                  d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"
-                />
-              </svg>
-              Weekly
-            </button>
-            <button class="btn btn-outline-secondary">Download All</button>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                id="categories-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#categories"
+                role="tab"
+                aria-controls="categories"
+                aria-selected="false"
+                >Categories</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div
+              class="tab-pane fade show active"
+              id="stocks"
+              role="tabpanel"
+              aria-labelledby="stocks-tab"
+            >
+              <div
+                class="d-flex align-items-center justify-content-between"
+              ></div>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Remaining Quantity</th>
+                    <th scope="col">Turn Over</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="
+                      let top of _transactionCalculator.calculateTopSellingStocks()
+                    "
+                  >
+                    <td scope="row">{{ top.name }}</td>
+                    <td>{{ getProduct(top.id)?.category }}</td>
+                    <td>{{ countRemaining(top.name, _productItemList) }}</td>
+                    <td>{{ formatPrice(top.price) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="categories"
+              role="tabpanel"
+              aria-labelledby="categories-tab"
+            >
+              <div
+                class="d-flex align-items-center justify-content-between"
+              ></div>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Category</th>
+
+                    <th scope="col text-end">Turn Over</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- top 5 also -->
+                  <tr
+                    *ngFor="
+                      let top of _transactionCalculator
+                        .getCategorySales(_transactionList, _productList)
+                        .slice(0, 5)
+                    "
+                  >
+                    <td>{{ top.category }}</td>
+                    <td>{{ formatPrice(top.totalSales) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <canvas
-          style="max-height: 400px"
-          baseChart
-          [datasets]="barChartData"
-          [labels]="barChartLabels"
-          [options]="barChartOptions"
-          [legend]="barChartLegend"
-        >
-        </canvas>
-      </div>
-    </div>
-
-    <div class="col-12">
-      <div class="containers">
-        <div class="d-flex align-items-center justify-content-between">
-          <h5>Best Selling Product</h5>
-          <button type="button" class="btn btn-light text-primary">
-            See all
-          </button>
-        </div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Category</th>
-              <th scope="col">Remaining Quantity</th>
-              <th scope="col">Turn Over</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="
-                let top of _transactionCalculator.calculateTopSellingStocks()
-              "
-            >
-              <th scope="row">{{ top.name }}</th>
-              <td>{{ getProduct(top.id)?.category }}</td>
-              <td>{{ countRemaining(top.name, _productItemList) }}</td>
-              <td>{{ formatPrice(top.price) }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </div>

@@ -137,4 +137,10 @@ export class SettingsComponent implements OnDestroy {
       (this.page - 1) * this.pageSize + this.pageSize
     );
   }
+  deleteNewsLetter(nid: string) {
+    this.newsLetterService
+      .deleteNewsletter(nid)
+      .then(() => this.toastr.success('Successfully Deleted!'))
+      .catch((err) => this.toastr.error(err.toString()));
+  }
 }

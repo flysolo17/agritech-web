@@ -24,15 +24,28 @@ import {
   uploadBytes,
 } from '@angular/fire/storage';
 
-import { Observable, catchError, forkJoin, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  catchError,
+  forkJoin,
+  switchMap,
+} from 'rxjs';
 import { collectionData } from 'rxfire/firestore';
 import { OrderItems } from '../models/transaction/order_items';
+import { Transactions } from '../models/transaction/transactions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
   _collection_name = 'products';
+
+  private productSubject: BehaviorSubject<Products[]> = new BehaviorSubject<
+    Products[]
+  >([]);
+  public products$: Observable<Products[]> = this.productSubject.asObservable();
+
   constructor(private firestore: Firestore, private storage: Storage) {}
   getAllProducts(): Observable<Products[]> {
     return collectionData(
@@ -49,6 +62,10 @@ export class ProductService {
       ).withConverter(productConverter),
       product
     );
+  }
+
+  setProduct(product: Products[]) {
+    this.productSubject.next(product);
   }
 
   async batchUpdateProductQuantity(orderItems: OrderItems[]) {

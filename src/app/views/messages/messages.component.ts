@@ -25,10 +25,11 @@ import { formatTimeDifference } from 'src/app/utils/constants';
 export class MessagesComponent implements OnInit, OnDestroy {
   selectedCustomer: Customers | null = null;
   selectedUser: Users | null = null;
-
+  searchText: string = '';
   $customers: Customers[] = [];
   $messages: Messages[] = [];
   userWithMessages$: UserWithMessages[] = [];
+  ALL$: UserWithMessages[] = [];
   users$: Users | null = null;
   messageSubscription$: Subscription;
   selectedConvo: number = -1;
@@ -90,42 +91,21 @@ export class MessagesComponent implements OnInit, OnDestroy {
       )
       .subscribe((data) => {
         this.userWithMessages$ = data;
+        this.ALL$ = data;
         this.cdr.detectChanges();
       });
-    // this.userWithMessages$ = this.messagesService.getAllCustomer().pipe(
-    //   switchMap((customers) => {
-    //     return this.messagesService.messages$.pipe(
-    //       map((messages) => {
-    //         return customers
-    //           .map((customer) => {
-    //             const filteredMessages = messages
-    //               .filter(
-    //                 (message) =>
-    //                   message.senderID === customer.id ||
-    //                   message.receiverID === customer.id
-    //               )
-    //               .sort(
-    //                 (a, b) =>
-    //                   b.createdAt.toDate().getTime() -
-    //                   a.createdAt.toDate().getTime()
-    //               );
-    //             return { customers: customer, messages: filteredMessages };
-    //           })
-    //           .sort((a, b) => {
-    //             const timestampA =
-    //               a.messages.length > 0
-    //                 ? a.messages[0].createdAt.toDate().getTime()
-    //                 : 0;
-    //             const timestampB =
-    //               b.messages.length > 0
-    //                 ? b.messages[0].createdAt.toDate().getTime()
-    //                 : 0;
-    //             return timestampB - timestampA;
-    //           });
-    //       })
-    //     );
-    //   })
-    // );
+  }
+
+  search() {
+    if (this.searchText === '') {
+      this.userWithMessages$ = this.ALL$;
+    } else {
+      this.userWithMessages$ = this.ALL$.filter((e) => {
+        return e.customers.name
+          .toLowerCase()
+          .includes(this.searchText.toLowerCase());
+      });
+    }
   }
 
   formatDate(timestamp: Timestamp) {

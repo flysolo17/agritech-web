@@ -8,6 +8,7 @@ import { TransactionsService } from 'src/app/services/transactions.service';
 import { formatPrice, months } from 'src/app/utils/constants';
 import { ProductCalculator } from 'src/app/utils/product_calc';
 import { TransactionCalculator } from 'src/app/utils/transaction_calc';
+import * as echarts from 'echarts'; // added ECharts run on terminal "npm install echarts --save"
 
 export interface BestSellingCategories {
   category: string;
@@ -25,8 +26,8 @@ export class ReportsComponent implements OnInit {
   _productList: Products[] = [];
   _lowStocks: Order[] = [];
   _productItemList: Order[] = [];
-
   _transactionList: Transactions[] = [];
+
   public barChartOptions = {
     responsive: true,
   };
@@ -35,13 +36,18 @@ export class ReportsComponent implements OnInit {
   public barChartLegend: boolean = true;
 
   public barChartData = [
+    // changed colors of data bars
     {
       data: [10000, 20000, 30000, 40000, 50000, 60000],
       label: 'Sales',
+      backgroundColor: '#91cc75',
+      hoverBackgroundColor: '#91cc75',
     },
     {
       data: [10000, 20000, 30000, 40000, 50000, 60000],
       label: 'Revenue',
+      backgroundColor: '#fac858',
+      hoverBackgroundColor: '#fac858',
     },
   ];
 
@@ -71,6 +77,8 @@ export class ReportsComponent implements OnInit {
         this.barChartLabels = months;
         this.barChartData[0].data =
           this._transactionCalculator.generateTotalSalesPerMoth(months);
+
+        this.renderFastMovingProductsChart(); //Added - Joery
 
         console.log('Transactions', this.barChartData[0]);
         this.barChartData[1].data =
@@ -109,5 +117,76 @@ export class ReportsComponent implements OnInit {
     let categories = new Set(
       this._productList.map((e) => e.category.toLocaleLowerCase())
     );
+  }
+
+  //Added Code
+  renderFastMovingProductsChart(): void {
+    const chartElement = document.getElementById('fastMovingProductsChart');
+
+    if (!chartElement) {
+      console.log('fastMovingProductsChart not found.');
+      return;
+    }
+
+    const chart = echarts.init(chartElement);
+    const fastMovingProducts =
+      this._transactionCalculator.getFastMovingProducts();
+
+    const productNames = fastMovingProducts.map(
+      (product) => product.productName
+    );
+    const seriesData = fastMovingProducts.map((product) => ({
+      value: product.totalSales,
+      extraData: product.quantitySold.toFixed(),
+      name: product.productName,
+    }));
+
+    const currentDate = new Date();
+    const currentMonthName = currentDate.toLocaleString('default', {
+      month: 'long',
+    });
+
+    const option = {
+      title: {
+        text: '',
+        subtext: `Month: ${currentMonthName}`,
+        left: 'left',
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter:
+          '<b>{a}:</b> {c} <br/> <b>Product Name:</b> {b} <br/> <b>Quantity Sold:</b> {d} ',
+      },
+      legend: {
+        orient: 'horizontal',
+        bottom: 'bottom',
+        data: productNames,
+      },
+      series: [
+        {
+          name: 'Sales Made',
+          type: 'pie',
+          radius: ['25%', '80%'],
+          center: ['50%', '50%'],
+          data: seriesData,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2,
+          },
+          label: {
+            show: false,
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    };
+    chart.setOption(option);
   }
 }

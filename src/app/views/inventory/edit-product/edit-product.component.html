@@ -42,6 +42,7 @@
                       <div class="image-wrapper">
                         <img [src]="image" width="100px" height="100px" />
                         <button
+                          type="button"
                           (click)="deleteImage(i, image)"
                           class="btn btn-danger btn-circle btn-sm"
                         >
@@ -168,7 +169,7 @@
                   <button
                     class="btn btn-outline-primary w-75"
                     type="button"
-                    (click)="createVariationModal.show()"
+                    (click)="addVariation()"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -354,9 +355,3 @@
     </div>
   </div>
 </div>
-
-<app-add-variation
-  (onSubmit)="saveVariation($event)"
-  [productID]="product?.id ?? ''"
-  [variations]="variationList$"
-></app-add-variation>

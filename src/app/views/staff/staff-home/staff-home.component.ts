@@ -1,6 +1,13 @@
-import { Component, OnDestroy, OnInit, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  AfterViewInit,
+  inject,
+} from '@angular/core';
 import { User } from '@angular/fire/auth';
 import { Timestamp, Transaction, or } from '@angular/fire/firestore';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as bootstrap from 'bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
@@ -22,6 +29,7 @@ import {
   formatPrice,
   getEffectivePrice,
 } from 'src/app/utils/constants';
+import { ConfirmCheckoutComponent } from '../confirm-checkout/confirm-checkout.component';
 
 declare var window: any;
 @Component({
@@ -30,8 +38,6 @@ declare var window: any;
   styleUrls: ['./staff-home.component.css'],
 })
 export class StaffHomeComponent implements OnInit, AfterViewInit {
-  checkoutModal: any;
-
   _products: Products[] = [];
   _categories: string[] = [];
   _productItems: Order[] = [];
@@ -73,9 +79,6 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
         this._productItems.push(...productToOrder(product));
       });
     });
-    this.checkoutModal = new window.bootstrap.Modal(
-      document.getElementById('checkoutModal')
-    );
   }
 
   filterProductsPercategory(category: string): Order[] {
@@ -91,6 +94,24 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private modalService = inject(NgbModal);
+  showConfirmCheckoutDialog() {
+    const modal = this.modalService.open(ConfirmCheckoutComponent);
+    modal.componentInstance.users = this._users;
+    modal.componentInstance.orders = this._cart;
+    modal.result
+      .then((data: any) => {
+        let transaction = data as Transactions;
+        if (transaction) {
+          this.confirmOrder(transaction);
+        } else {
+          this.toastr.error('Invalid transaction');
+        }
+      })
+      .catch((err) => {
+        this.toastr.error(err.toString());
+      });
+  }
   formatPrice(num: number): string {
     return formatPrice(num);
   }
@@ -138,10 +159,7 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
       this.toastr.error('No cashier logged in!', 'Invalid Transaction');
       return;
     }
-    this.checkoutModal.show();
-  }
-  closeModal() {
-    this.checkoutModal.hide();
+    this.showConfirmCheckoutDialog();
   }
 
   confirmOrder(transaction: Transactions) {
@@ -169,7 +187,7 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
       .catch((err) => this.toastr.error(err.message))
       .finally(() => {
         this.loadingService.hideLoading('checkout');
-        this.closeModal();
+
         this._cart = [];
       });
   }

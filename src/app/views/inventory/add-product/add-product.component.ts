@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -15,6 +15,18 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
 import { generateInvoiceID } from 'src/app/utils/constants';
 import { v4 as uuidv4 } from 'uuid';
+import { NgbModal, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
+import {
+  Observable,
+  OperatorFunction,
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  merge,
+} from 'rxjs';
+import { AddVariationComponent } from '../add-variation/add-variation.component';
 declare var window: any;
 @Component({
   selector: 'app-add-product',
@@ -22,11 +34,12 @@ declare var window: any;
   styleUrls: ['./add-product.component.css'],
 })
 export class AddProductComponent implements OnInit {
+  options: string[] = [];
+
   _imageURL: string[] = [];
   productID: string;
   _selectedFiles: File[] = [];
   variationList$: Variation[] = [];
-  createVariationModal: any;
   productForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.required),
     description: new FormControl('', [
@@ -39,9 +52,9 @@ export class AddProductComponent implements OnInit {
     price: new FormControl(0, Validators.required),
     stocks: new FormControl(0, Validators.required),
     minimum: new FormControl(0, Validators.required),
-
     shipping: new FormControl(0, Validators.required),
   });
+  products$: Products[] = [];
   users: Users | null = null;
   constructor(
     private productService: ProductService,
@@ -56,10 +69,22 @@ export class AddProductComponent implements OnInit {
       this.users = data;
     });
   }
+  private modalService = inject(NgbModal);
+  addVariation() {
+    const modalRef = this.modalService.open(AddVariationComponent);
+    modalRef.componentInstance.productID = this.productID;
+    modalRef.componentInstance.variations = this.variationList$;
+    modalRef.result
+      .then((data: Variation) => {
+        this.saveVariation(data);
+      })
+      .catch((err) => this.toaster.error(err.toString()));
+  }
   ngOnInit(): void {
-    this.createVariationModal = new window.bootstrap.Modal(
-      document.getElementById('addvariation')
-    );
+    this.productService.products$.subscribe((data) => {
+      this.products$ = data;
+      this.options = Array.from(new Set(data.map((e) => e.category)));
+    });
   }
   onSubmitProduct() {
     if (this._imageURL.length == 0) {
@@ -124,31 +149,40 @@ export class AddProductComponent implements OnInit {
         });
     }
   }
-  saveProduct(product: Products) {
-    this.productService
-      .addProduct(product)
-      .then(async (data) => {
-        await this.auditService.saveAudit({
-          id: '',
-          email: this.users?.email || '',
-          role: this.users?.type || UserType.ADMIN,
-          action: ActionType.CREATE,
-          component: ComponentType.INVENTORY,
-          payload: product,
-          details: 'adding  product',
-          timestamp: Timestamp.now(),
-        });
-        this.toaster.success('new product added', 'Product added!');
-      })
-      .catch((err) => this.toaster.error(err.message, 'Error'))
-      .finally(() => {
-        this.loadingService.hideLoading('add-product');
-        this.location.back();
+  async saveProduct(product: Products) {
+    const productExists = this.products$.some(
+      (data) =>
+        product.name.toLocaleLowerCase() === data.name.toLocaleLowerCase()
+    );
+    if (productExists) {
+      this.toaster.warning(`${product.name} already exists`);
+      this.loadingService.hideLoading('add-product');
+      return;
+    }
+
+    try {
+      await this.productService.addProduct(product);
+      await this.auditService.saveAudit({
+        id: '',
+        email: this.users?.email || '',
+        role: this.users?.type || UserType.ADMIN,
+        action: ActionType.CREATE,
+        component: ComponentType.INVENTORY,
+        payload: product,
+        details: 'adding product',
+        timestamp: Timestamp.now(),
       });
+      this.toaster.success('New product added', 'Product added!');
+    } catch (error) {
+      this.toaster.error(error?.toString(), 'Error');
+    } finally {
+      this.loadingService.hideLoading('add-product');
+      this.location.back();
+    }
   }
+
   saveVariation(data: Variation) {
     this.variationList$.push(data);
-    this.createVariationModal.hide();
     let cost = this.productForm.controls['cost'].value ?? 0;
     let price = this.productForm.controls['price'].value ?? 0;
     let stocks = this.productForm.controls['stocks'].value ?? 0;
@@ -186,4 +220,35 @@ export class AddProductComponent implements OnInit {
     };
     return product;
   }
+
+  model: any;
+
+  @ViewChild('instance', { static: true }) instance!: NgbTypeahead;
+
+  focus$ = new Subject<string>();
+  click$ = new Subject<string>();
+
+  search: OperatorFunction<string, readonly string[]> = (
+    text$: Observable<string>
+  ) => {
+    const debouncedText$ = text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged()
+    );
+    const clicksWithClosedPopup$ = this.click$.pipe(
+      filter(() => !this.instance.isPopupOpen())
+    );
+    const inputFocus$ = this.focus$;
+
+    return merge(debouncedText$, inputFocus$, clicksWithClosedPopup$).pipe(
+      map((term) =>
+        (term === ''
+          ? this.options
+          : this.options.filter(
+              (v) => v.toLowerCase().indexOf(term.toLowerCase()) > -1
+            )
+        ).slice(0, 10)
+      )
+    );
+  };
 }

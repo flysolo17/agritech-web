@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { Timestamp } from '@angular/fire/firestore';
 import { NavigationExtras, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -28,6 +28,9 @@ import { AuditLogService } from 'src/app/services/audit-log.service';
 import { UserType } from 'src/app/models/user-type';
 import { ActionType, ComponentType } from 'src/app/models/audit/audit_type';
 import { TransactionCalculator } from 'src/app/utils/transaction_calc';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AddDriverComponent } from 'src/app/components/add-driver/add-driver.component';
+import { AddPaymentComponent } from 'src/app/components/add-payment/add-payment.component';
 declare var window: any;
 declare var window2: any;
 @Component({
@@ -38,10 +41,9 @@ declare var window2: any;
 export class OrdersComponent implements OnInit {
   _transactionList: Transactions[] = [];
   private _users: Users | null = null;
-  driversDialog: any;
-  paymentDialog: any;
-  selectedTransaction: Transactions | null = null;
+
   transactionCalculator: TransactionCalculator;
+
   constructor(
     private transactionService: TransactionsService,
     public loadingService: LoadingService,
@@ -57,13 +59,28 @@ export class OrdersComponent implements OnInit {
       this._users = data;
     });
   }
+  private modalService = inject(NgbModal);
+  selectTransactionToAddPayment(transaction: Transactions) {
+    const modal = this.modalService.open(AddPaymentComponent);
+    modal.componentInstance.transaction = transaction;
+    modal.result
+      .then((data: any) => {
+        let transaction = data as Transactions;
+        this.addPayment(transaction.payment, transaction.id);
+      })
+      .catch((err) => {
+        this.toastrService.error(err.toString());
+      });
+  }
+  addDriver(transaction: Transactions) {
+    const modal = this.modalService.open(AddDriverComponent);
+    modal.result
+      .then((data: Users) => {
+        this.isDriverSelected(data, transaction.id);
+      })
+      .catch((err) => this.toastrService.error(err.toString()));
+  }
   ngOnInit(): void {
-    this.driversDialog = new window.bootstrap.Modal(
-      document.getElementById('driver')
-    );
-    this.paymentDialog = new bootstrap.Modal(
-      document.getElementById('payment') ?? ''
-    );
     this.transactionService.transactions$.subscribe((value) => {
       this._transactionList = value.filter(
         (e) =>
@@ -79,20 +96,6 @@ export class OrdersComponent implements OnInit {
   }
   convertTimestamp(timestamp: Timestamp) {
     return formatTimestamp(timestamp);
-  }
-
-  selectTransaction(transaction: Transactions) {
-    this.selectedTransaction = transaction;
-    if (this.selectTransaction !== null) {
-      this.driversDialog.show();
-    }
-  }
-
-  selectTransactionForPayment(transaction: Transactions) {
-    this.selectedTransaction = transaction;
-    if (this.selectTransaction !== null) {
-      this.paymentDialog.show();
-    }
   }
 
   acceptOrder(transactionID: string, payment: Payment) {
@@ -306,41 +309,9 @@ export class OrdersComponent implements OnInit {
     }
     return false;
   }
-  isDriverSelected(user: Users) {
-    if (this.selectedTransaction !== null) {
-      this.transactionService
-        .addDriver(this.selectedTransaction?.id ?? '', user.id)
-        .then(async () => {
-          await this.auditService.saveAudit({
-            id: '',
-            email: this._users?.email ?? '',
-            role: this._users?.type ?? UserType.ADMIN,
-            action: ActionType.UPDATE,
-            component: ComponentType.TRANSACTION,
-            payload: {
-              ...this.selectTransaction,
-              user: user.name,
-              email: user.email,
-              phone: user.phone,
-            },
-            details: 'adding driver',
-            timestamp: Timestamp.now(),
-          });
-          this.toastrService.success(`${user.name} is selected`);
-        })
-        .catch((err) => this.toastrService.success(err.toString()))
-        .finally(() => {
-          this.selectedTransaction = null;
-          this.driversDialog.hide();
-        });
-    }
-  }
-
-  addPayment(payment: Payment) {
-    this.loadingService.showLoading('payment');
-
+  isDriverSelected(user: Users, transactionID: string) {
     this.transactionService
-      .addPayment(this.selectedTransaction?.id ?? '', payment)
+      .addDriver(transactionID, user.id)
       .then(async () => {
         await this.auditService.saveAudit({
           id: '',
@@ -349,7 +320,31 @@ export class OrdersComponent implements OnInit {
           action: ActionType.UPDATE,
           component: ComponentType.TRANSACTION,
           payload: {
-            transactionID: this.selectedTransaction?.id ?? '',
+            transactionID,
+            user: user.name,
+            email: user.email,
+            phone: user.phone,
+          },
+          details: 'adding driver',
+          timestamp: Timestamp.now(),
+        });
+        this.toastrService.success(`${user.name} is selected`);
+      })
+      .catch((err) => this.toastrService.success(err.toString()));
+  }
+
+  addPayment(payment: Payment, transactionID: string) {
+    this.transactionService
+      .addPayment(transactionID, payment)
+      .then(async () => {
+        await this.auditService.saveAudit({
+          id: '',
+          email: this._users?.email ?? '',
+          role: this._users?.type ?? UserType.ADMIN,
+          action: ActionType.UPDATE,
+          component: ComponentType.TRANSACTION,
+          payload: {
+            transactionID: transactionID,
             payment: payment,
           },
           details: 'adding payment to transaction',
@@ -357,12 +352,7 @@ export class OrdersComponent implements OnInit {
         });
         this.toastrService.success('payment success');
       })
-      .catch((err) => this.toastrService.error(err.message))
-      .finally(() => {
-        this.loadingService.hideLoading('payment');
-        this.selectedTransaction = null;
-        this.paymentDialog.hide();
-      });
+      .catch((err) => this.toastrService.error(err.message));
   }
 
   formatPHP(num: number) {

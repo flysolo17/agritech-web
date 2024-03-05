@@ -123,6 +123,46 @@
                   >
                   <div class="col-sm-10">
                     <input
+                      id="typeahead-focus"
+                      type="text"
+                      formControlName="category"
+                      class="form-control"
+                      [(ngModel)]="model"
+                      [ngbTypeahead]="search"
+                      (focus)="focus$.next($any($event).target.value)"
+                      (click)="click$.next($any($event).target.value)"
+                      #instance="ngbTypeahead"
+                    />
+                    <!-- <input
+                      formControlName="category"
+                      type="text"
+                      class="form-control"
+                      id="autocomplete"
+                      placeholder="Enter characters..."
+                      [(ngModel)]="inputValue"
+                      (ngModelChange)="filterOptions($event)"
+                    />
+
+                    <ul
+                      *ngIf="filteredOptions.length > 0"
+                      id="autocomplete-suggestions"
+                      class="list-group"
+                    >
+                      <li
+                        *ngFor="let option of filteredOptions"
+                        class="list-group-item"
+                        (click)="selectOption(option)"
+                      >
+                        {{ option }}
+                      </li>
+                    </ul> -->
+                  </div>
+
+                  <!-- <label for="category" class="col-sm-2 col-form-label"
+                    >* Category</label
+                  >
+                  <div class="col-sm-10">
+                    <input
                       formControlName="category"
                       class="form-control"
                       list="datalistOptions"
@@ -137,7 +177,7 @@
                       <option value="molluscicide"></option>
                       <option value="seeds"></option>
                     </datalist>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="row mb-3">
                   <label for="expire" class="col-sm-2 col-form-label"
@@ -168,7 +208,7 @@
                   <button
                     class="btn btn-outline-primary w-75"
                     type="button"
-                    (click)="createVariationModal.show()"
+                    (click)="addVariation()"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -354,9 +394,3 @@
     </div>
   </div>
 </div>
-
-<app-add-variation
-  (onSubmit)="saveVariation($event)"
-  [productID]="productID"
-  [variations]="variationList$"
-></app-add-variation>
