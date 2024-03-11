@@ -194,7 +194,32 @@
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
                 <div class="d-flex gap-2">
-                  <button class="btn btn-danger">Decline</button>
+                  <button
+                    class="btn btn-danger"
+                    [disabled]="
+                      (loadingService.isLoading(transactions.id) | async) ===
+                      true
+                    "
+                    (click)="
+                      declineOrder(transactions.id, transactions.payment)
+                    "
+                  >
+                    <span
+                      *ngIf="
+                        (loadingService.isLoading(transactions.id) | async) ===
+                        true
+                      "
+                      class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    {{
+                      (loadingService.isLoading(transactions.id) | async) ===
+                      true
+                        ? "loading..."
+                        : "Decline"
+                    }}
+                  </button>
                   <button
                     class="btn btn-success"
                     (click)="acceptOrder(transactions.id, transactions.payment)"
@@ -567,10 +592,10 @@
               <td>{{ convertTimestamp(transactions.createdAt) }}</td>
               <td>
                 <button
-                  (click)="markAsComplete(transactions, transactions.payment)"
                   class="btn btn-success"
+                  (click)="reviewTransaction(transactions)"
                 >
-                  Completed
+                  Review
                 </button>
               </td>
             </tr>
