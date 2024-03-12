@@ -7,6 +7,8 @@ import { Transactions } from 'src/app/models/transaction/transactions';
 import { TransactionsService } from 'src/app/services/transactions.service';
 import { formatTimestamp } from 'src/app/utils/constants';
 
+import { Location } from '@angular/common'; //Added
+
 @Component({
   selector: 'app-view-customer-profile',
   templateUrl: './view-customer-profile.component.html',
@@ -17,7 +19,8 @@ export class ViewCustomerProfileComponent implements OnInit {
   transactions$: Transactions[] = [];
   constructor(
     private activatedRoute: ActivatedRoute,
-    private transactionService: TransactionsService
+    private transactionService: TransactionsService,
+    public location: Location //Added
   ) {
     this.activatedRoute.queryParams.subscribe((params) => {
       const encodedObject: Customers = (params as Customers) ?? null;

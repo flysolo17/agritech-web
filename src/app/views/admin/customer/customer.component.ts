@@ -23,6 +23,10 @@ import {
 export class CustomerComponent implements OnInit, OnDestroy {
   $customers: Customers[] = [];
   $customerSubscription: Subscription;
+
+  searchCustomerName: string = ''; //Added
+  filterCustomers: Customers[] = []; //Added
+
   constructor(
     private customerService: CustomerService,
     private cdr: ChangeDetectorRef,
@@ -35,7 +39,7 @@ export class CustomerComponent implements OnInit, OnDestroy {
       .getAllCustomer()
       .subscribe((customers) => {
         this.$customers = customers;
-
+        this.applyFilter(); //Added
         this.cdr.detectChanges();
       });
   }
@@ -57,4 +61,13 @@ export class CustomerComponent implements OnInit, OnDestroy {
       queryParams: customer,
     });
   }
+  //Added
+  applyFilter(): void {
+    this.filterCustomers = this.$customers.filter((Customers) =>
+      Customers.name
+        .toLowerCase()
+        .includes(this.searchCustomerName.toLowerCase())
+    );
+  }
+  //END
 }

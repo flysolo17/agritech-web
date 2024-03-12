@@ -47,6 +47,9 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
   selectTab(index: number) {
     this.activeTab = index;
   }
+
+  searchProductName: string = ''; //Added
+  filteredProducts: { [category: string]: Order[] } = {}; //Added
   constructor(
     private productService: ProductService,
     private authService: AuthService,
@@ -57,6 +60,19 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
   ) {
     this.authService.users$.subscribe((value) => {
       this._users = value;
+    });
+  }
+
+  //Search Filter
+  applyFilter(): void {
+    this._categories.forEach((category) => {
+      const filteredProducts = this.filterProductsPercategory(category).filter(
+        (product) =>
+          product.name
+            .toLowerCase()
+            .includes(this.searchProductName.toLowerCase())
+      );
+      this.filteredProducts[category] = filteredProducts;
     });
   }
 
@@ -78,6 +94,7 @@ export class StaffHomeComponent implements OnInit, AfterViewInit {
       this._products.map((product) => {
         this._productItems.push(...productToOrder(product));
       });
+      this.applyFilter();
     });
   }
 

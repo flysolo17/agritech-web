@@ -5,6 +5,7 @@ export interface Customers {
   id: string;
   name: string;
   phone: string;
+  email: string;
   profile: string;
   createdAt: Date;
   addresses: CustomerAddress[];

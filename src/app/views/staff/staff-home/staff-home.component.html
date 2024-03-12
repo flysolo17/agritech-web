@@ -3,6 +3,24 @@
     class="container-fluid d-flex flex-column gap-2 h-100"
     style="flex: 3; overflow: auto"
   >
+    <div class="search-bar">
+      <input
+        type="text"
+        class="form-control mb-3"
+        [(ngModel)]="searchProductName"
+        (input)="applyFilter()"
+        placeholder="Search product name..."
+        style="
+          width: 60%;
+          padding-left: 50px;
+          background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 fill=%22currentColor%22 class=%22bi bi-search%22 viewBox=%220 0 16 16%22%3E%3Cpath d=%22M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0%22/%3E%3C/svg%3E');
+          background-size: 20px;
+          background-position: 10px center;
+          background-repeat: no-repeat;
+        "
+      />
+    </div>
+
     <ul class="nav nav-pills">
       <li class="nav-item" *ngFor="let category of _categories; let i = index">
         <a
@@ -21,33 +39,35 @@
         *ngFor="let category of _categories; let i = index"
         [class.active]="i === activeTab"
       >
-        <div class="flex-container">
-          <div
-            class="child-container"
-            *ngFor="let product of filterProductsPercategory(category)"
-          >
+        <div class="container">
+          <div class="flex-container">
             <div
-              class="card"
-              style="width: 100%; height: 100%"
-              (click)="addOrder(product)"
+              class="child-container"
+              *ngFor="let product of filteredProducts[category]"
             >
-              <img
-                [src]="product.image"
-                class="card-img-top"
-                height="60%"
-                width="100%"
-                alt="product image"
-              />
-              <div class="card-body">
-                <h6 class="card-title" id="product-title">
-                  {{ product.name }}
-                </h6>
-                <h5 class="card-text text-success">
-                  {{ formatPrice(product.price) }}
-                </h5>
-                <span class="text-secondary"
-                  >{{ product.stocks }} items left</span
-                >
+              <div
+                class="card p-3"
+                style="width: 100%; height: 100%"
+                (click)="addOrder(product)"
+              >
+                <img
+                  [src]="product.image"
+                  class="card-img-top"
+                  height="60%"
+                  width="100%"
+                  alt="product image"
+                />
+                <div class="card-body">
+                  <h6 class="card-title" id="product-title">
+                    {{ product.name }}
+                  </h6>
+                  <h5 class="card-text text-success">
+                    {{ formatPrice(product.price) }}
+                  </h5>
+                  <span class="text-secondary"
+                    >{{ product.stocks }} items left</span
+                  >
+                </div>
               </div>
             </div>
           </div>
@@ -55,50 +75,33 @@
       </div>
     </div>
   </div>
-  <div class="container-fluid" id="order-container">
-    <div class="d-flex align-items-center justify-content-between">
-      <div>
-        <h5>{{ _users?.name ?? "no cashier " }}</h5>
-        <span>CASHIER</span>
-      </div>
-      <div class="d-flex gap-2">
-        <button
-          class="btn btn-outline-secondary"
-          [routerLink]="['transactions', encodedUser()]"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-archive"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"
-            />
-          </svg>
-        </button>
 
-        <button class="btn btn-outline-secondary" (click)="signOut()">
+  <div class="container-fluid" id="order-container">
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="row align-items-center" style="width: 100%">
+        <div class="col-auto">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
+            width="42"
+            height="42"
             fill="currentColor"
-            class="bi bi-box-arrow-in-left"
+            class="bi bi-person-square"
             viewBox="0 0 16 16"
           >
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
             <path
-              fill-rule="evenodd"
-              d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"
-            />
-            <path
-              fill-rule="evenodd"
-              d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"
+              d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"
             />
           </svg>
-        </button>
+        </div>
+        <div class="col">
+          <div class="row">
+            <h5>
+              <b>{{ _users?.name ?? "No cashier" }}</b>
+            </h5>
+            <span>Cashier</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="divider"></div>
@@ -137,9 +140,11 @@
                     />
                   </svg>
                 </button>
-                <h5 class="card-text text-success">
-                  {{ order.quantity }}
-                </h5>
+                <input
+                  class="form-control quantity-input"
+                  type="number"
+                  [(ngModel)]="order.quantity"
+                />
                 <button
                   class="btn btn-secondary btn-sm"
                   (click)="increaseQuantity(index, order)"
@@ -158,6 +163,7 @@
                   </svg>
                 </button>
               </div>
+
               <h5 class="card-text text-success fw-bold">
                 {{ formatPrice(order.price * order.quantity) }}
               </h5>

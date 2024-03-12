@@ -79,6 +79,7 @@ export class ProductComponent implements OnInit {
     return totalStocks;
   }
 
+  //changed to  pie chart
   renderProductCategoryQuantity() {
     const chartElement = document.getElementById('category-stocks');
     const chart = echarts.init(chartElement);
@@ -96,29 +97,23 @@ export class ProductComponent implements OnInit {
         left: 'center',
       },
       tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow',
-        },
+        trigger: 'item',
       },
       legend: {
         orient: 'horizontal',
         bottom: 'bottom',
-        data: ['Stocks'],
-      },
-      xAxis: {
-        type: 'category',
         data: categories,
-      },
-      yAxis: {
-        type: 'value',
       },
       series: [
         {
           name: 'Stocks',
-          type: 'bar',
-          data: quantities,
-
+          type: 'pie',
+          radius: ['25%', '80%'],
+          center: ['50%', '50%'],
+          data: categories.map((category, index) => ({
+            name: category,
+            value: quantities[index],
+          })),
           itemStyle: {
             borderRadius: 10,
             borderColor: '#fff',

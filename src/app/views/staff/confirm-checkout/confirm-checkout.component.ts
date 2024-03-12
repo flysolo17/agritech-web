@@ -32,45 +32,62 @@ export class ConfirmCheckoutComponent {
   activeModal = inject(NgbActiveModal);
   cashReceived: number = 0;
   constructor(public loadingService: LoadingService) {}
+
+  //updated code for front-end validation
   submit(cash: number) {
-    let items = ordersToOrderItems(this.orders);
-    let details: TrasactionDetails = {
-      updatedBy: '',
-      message: `Cashier : ${
-        this.users?.name ?? ''
-      }  received :  ${this.formatNumber(
-        cash
-      )} total order value : ${this.formatNumber(this.subtotal(this.orders))}`,
-      status: TransactionStatus.COMPLETED,
-      updatedAt: Timestamp.now(),
-    };
-    let paymentDetails: PaymentDetails = {
-      confirmedBy: this.users?.name ?? '',
-      reference: '',
-      attachmentURL: '',
-      createdAt: Timestamp.now(),
-      cashReceive: cash,
-    };
-    let transaction: Transactions = {
-      id: '',
-      customerID: '',
-      driverID: '',
-      cashierID: this.users?.id ?? '',
-      type: TransactionType.WALK_IN,
-      orderList: items,
-      message: '',
-      status: TransactionStatus.COMPLETED,
-      payment: {
-        amount: this.subtotal(this.orders),
-        type: PaymentType.PAY_IN_COUNTER,
-        status: PaymentStatus.PAID,
-        details: paymentDetails,
-      },
-      details: [details],
-      createdAt: Timestamp.now(),
-    };
-    this.activeModal.close(transaction);
+    if (this.isAmountValid()) {
+      //Added if statement for Frontend validation
+      let items = ordersToOrderItems(this.orders);
+      let details: TrasactionDetails = {
+        updatedBy: '',
+        message: `Cashier : ${
+          this.users?.name ?? ''
+        }  received :  ${this.formatNumber(
+          cash
+        )} total order value : ${this.formatNumber(
+          this.subtotal(this.orders)
+        )}`,
+        status: TransactionStatus.COMPLETED,
+        updatedAt: Timestamp.now(),
+      };
+      let paymentDetails: PaymentDetails = {
+        confirmedBy: this.users?.name ?? '',
+        reference: '',
+        attachmentURL: '',
+        createdAt: Timestamp.now(),
+        cashReceive: cash,
+      };
+      let transaction: Transactions = {
+        id: '',
+        customerID: '',
+        driverID: '',
+        cashierID: this.users?.id ?? '',
+        type: TransactionType.WALK_IN,
+        orderList: items,
+        message: '',
+        status: TransactionStatus.COMPLETED,
+        payment: {
+          amount: this.subtotal(this.orders),
+          type: PaymentType.PAY_IN_COUNTER,
+          status: PaymentStatus.PAID,
+          details: paymentDetails,
+        },
+        details: [details],
+        createdAt: Timestamp.now(),
+      };
+      this.activeModal.close(transaction);
+    } else {
+      //
+    }
   }
+
+  // Added Frontend validation method if the amount is insufficient
+  isAmountValid(): boolean {
+    const totalAmount = this.subtotal(this.orders);
+    return this.cashReceived >= totalAmount;
+  }
+  //End Updated Code
+
   subtotal(orders: Order[]): number {
     return computeSubTotal(orders);
   }

@@ -54,14 +54,36 @@ export class TransactionsComponent implements OnInit {
   // Lifecycle hook - ngOnInit
   ngOnInit(): void {
     this.transactionService.transactions$.subscribe((data) => {
-      this.dataSource = data
+      this.dataSource = data;
       this.recentTransactions = data.filter(
         (e) =>
           e.createdAt.toDate() >= startOfDay(new Date()) &&
           e.cashierID == this._users?.id
       );
     });
+    //Added
+    this.transactionService.getAllTransactions().subscribe((transactions) => {
+      this._transactionList = transactions;
+      this.applyFilter(); // Apply initial filter
+    });
   }
+  applyFilter(): void {
+    if (!this.searchQuery.trim()) {
+      // If search query is empty, display all transactions
+      this.dataSource = this._transactionList;
+    } else {
+      // Filter transactions based on search query
+      const lowerCaseQuery = this.searchQuery.toLowerCase();
+      this.dataSource = this._transactionList.filter(
+        (transaction) =>
+          transaction.id.includes(lowerCaseQuery) ||
+          transaction.orderList.some((orderItem) =>
+            orderItem.productName.toLowerCase().includes(lowerCaseQuery)
+          )
+      );
+    }
+  }
+  //END
 
   private filterTransactions(query: string): void {
     if (!query.trim()) {
