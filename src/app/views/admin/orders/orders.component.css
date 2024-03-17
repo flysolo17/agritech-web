@@ -13,3 +13,25 @@
   flex-direction: column;
   background-color: white;
 }
+
+/* added code */
+.pending-accepted {
+  border-left: 25px solid #5474c4;
+}
+
+.completed {
+  border-left: 25px solid #91cc75;
+}
+
+.sales {
+  color: #91cc75;
+}
+
+.types {
+  border-left: 25px solid #73c0de;
+}
+
+.nav-fill .nav-link {
+  border: none;
+  color: darkgrey;
+}

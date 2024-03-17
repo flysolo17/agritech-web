@@ -73,7 +73,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
             };
           });
 
-          // Sort userWithMessages by the timestamp of the latest message in descending order
           userWithMessages.sort((a, b) => {
             const timestampA =
               a.messages.length > 0

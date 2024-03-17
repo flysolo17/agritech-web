@@ -358,4 +358,60 @@ export class OrdersComponent implements OnInit {
   formatPHP(num: number) {
     return formatPrice(num);
   }
+
+  //added
+  private isWithinLastSevenDays(timestamp: Timestamp): boolean {
+    const oneWeekAgo = Timestamp.now().toMillis() - 7 * 24 * 60 * 60 * 1000;
+    return timestamp.toMillis() >= oneWeekAgo;
+  }
+
+  //pending orders
+  calculatePendingOrders(): number {
+    const pendingTransactions = this._transactionList.filter(
+      (transaction) =>
+        transaction.status === TransactionStatus.PENDING &&
+        this.isWithinLastSevenDays(transaction.createdAt)
+    );
+    return pendingTransactions.length;
+  }
+
+  //accepted orders
+  calculateAcceptedOrders(): number {
+    const acceptedTransactions = this._transactionList.filter(
+      (transaction) =>
+        transaction.status === TransactionStatus.ACCEPTED &&
+        this.isWithinLastSevenDays(transaction.createdAt)
+    );
+    return acceptedTransactions.length;
+  }
+
+  //failed orders
+  calculateFailedOrders(): number {
+    const failedTransactions = this._transactionList.filter(
+      (transaction) =>
+        transaction.status === TransactionStatus.FAILED &&
+        this.isWithinLastSevenDays(transaction.createdAt)
+    );
+    return failedTransactions.length;
+  }
+
+  //pickup orders
+  calculatePickupOrders(): number {
+    const pickupTransactions = this._transactionList.filter(
+      (transaction) =>
+        transaction.type === TransactionType.PICK_UP &&
+        this.isWithinLastSevenDays(transaction.createdAt)
+    );
+    return pickupTransactions.length;
+  }
+
+  //delivery orders
+  calculateDeliveryOrders(): number {
+    const deliveryTransactions = this._transactionList.filter(
+      (transaction) =>
+        transaction.type === TransactionType.DELIVERY &&
+        this.isWithinLastSevenDays(transaction.createdAt)
+    );
+    return deliveryTransactions.length;
+  }
 }

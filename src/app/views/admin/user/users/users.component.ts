@@ -10,11 +10,17 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class UsersComponent implements OnInit {
   _users: Observable<Users[]>;
+  adminUsers: Users[] = [];
+  staffUsers: Users[] = [];
 
   constructor(private authService: AuthService) {
     this._users = new Observable<Users[]>();
   }
+
   ngOnInit(): void {
-    this._users = this.authService.getAllUsers();
+    this.authService.getAllUsers().subscribe((users) => {
+      this.adminUsers = users.filter((user) => user.type === 'admin');
+      this.staffUsers = users.filter((user) => user.type !== 'admin');
+    });
   }
 }
