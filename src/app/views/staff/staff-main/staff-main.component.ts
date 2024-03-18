@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { UserWithMessages } from 'src/app/models/UserWithMessages';
 import { Messages } from 'src/app/models/messages';
 import { Transactions } from 'src/app/models/transaction/transactions';
 import { Users } from 'src/app/models/users';
@@ -16,14 +17,16 @@ import { removeDuplicateMessages } from 'src/app/utils/constants';
 export class StaffMainComponent implements OnInit, OnDestroy {
   transactionSubscription: Subscription;
   $transactions: Transactions[] = [];
-  $messages: Messages[] = [];
+  $messages: UserWithMessages[] = [];
+  users$: Users | null = null;
   constructor(
     public authService: AuthService,
     private messageService: MessagesService,
     private transactionService: TransactionsService
   ) {
     authService.users$.subscribe((data) => {
-      this.listenToMessages(data?.id ?? '');
+      this.users$ = data;
+      this.listenToMessages(this.users$?.id ?? '');
     });
 
     this.transactionSubscription = this.transactionService
@@ -40,13 +43,20 @@ export class StaffMainComponent implements OnInit, OnDestroy {
     this.transactionSubscription.unsubscribe();
   }
   listenToMessages(uid: string) {
-    this.messageService.getAllMyMessages(uid).subscribe((data) => {
-      console.log(data);
-      this.$messages = removeDuplicateMessages(data);
+    this.messageService.getCustomerWithMessages(uid).subscribe((data) => {
+      this.$messages = data;
       this.messageService.updateMessages(data);
     });
   }
-  getUnSeenMessages() {
-    return this.$messages.filter((e) => !e.seen).length;
+  countNewMessages(messages: UserWithMessages[], uid: string): number {
+    let total = 0;
+    messages.map((data) => {
+      if (data.messages.length !== 0) {
+        if (data.messages[data.messages.length - 1].senderID !== uid) {
+          total += 1;
+        }
+      }
+    });
+    return total;
   }
 }

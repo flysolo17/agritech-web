@@ -73,13 +73,11 @@ export class TransactionCalculator {
     for (const transaction of this.transactions.filter(
       (e) =>
         e.status == TransactionStatus.COMPLETED &&
-        e.createdAt.toDate().getFullYear() === currentYear
+        e.createdAt.getFullYear() === currentYear
     )) {
-      const monthYear = transaction.createdAt
-        .toDate()
-        .toLocaleString('default', {
-          month: 'short',
-        });
+      const monthYear = transaction.createdAt.toLocaleString('default', {
+        month: 'short',
+      });
 
       const totalSales = transaction.orderList.reduce((total, orderItem) => {
         return total + orderItem.quantity * orderItem.price;
@@ -103,13 +101,11 @@ export class TransactionCalculator {
     for (const transaction of this.transactions.filter(
       (e) =>
         e.status == TransactionStatus.COMPLETED &&
-        e.createdAt.toDate().getFullYear() === currentYear
+        e.createdAt.getFullYear() === currentYear
     )) {
-      const monthYear = transaction.createdAt
-        .toDate()
-        .toLocaleString('default', {
-          month: 'short',
-        });
+      const monthYear = transaction.createdAt.toLocaleString('default', {
+        month: 'short',
+      });
 
       const totalSales = transaction.orderList.reduce((total, orderItem) => {
         return total + orderItem.quantity * orderItem.cost;
@@ -155,13 +151,11 @@ export class TransactionCalculator {
       (e) =>
         e.status == TransactionStatus.COMPLETED &&
         e.type == TransactionType.WALK_IN &&
-        e.createdAt.toDate().getFullYear() === currentYear
+        e.createdAt.getFullYear() === currentYear
     )) {
-      const monthYear = transaction.createdAt
-        .toDate()
-        .toLocaleString('default', {
-          month: 'short',
-        });
+      const monthYear = transaction.createdAt.toLocaleString('default', {
+        month: 'short',
+      });
 
       const totalSales = transaction.orderList.reduce((total, orderItem) => {
         return total + orderItem.quantity * orderItem.price;
@@ -189,13 +183,11 @@ export class TransactionCalculator {
         e.status == TransactionStatus.COMPLETED &&
         (e.type == TransactionType.DELIVERY ||
           e.type == TransactionType.PICK_UP) &&
-        e.createdAt.toDate().getFullYear() === currentYear
+        e.createdAt.getFullYear() === currentYear
     )) {
-      const monthYear = transaction.createdAt
-        .toDate()
-        .toLocaleString('default', {
-          month: 'short',
-        });
+      const monthYear = transaction.createdAt.toLocaleString('default', {
+        month: 'short',
+      });
 
       const totalSales = transaction.orderList.reduce((total, orderItem) => {
         return total + orderItem.quantity * orderItem.price;
@@ -267,8 +259,8 @@ export class TransactionCalculator {
     return this.transactions.filter(
       (transaction) =>
         transaction.status === TransactionStatus.COMPLETED &&
-        transaction.createdAt.toDate() >= sevenDaysAgo &&
-        transaction.createdAt.toDate() <= currentDate
+        transaction.createdAt >= sevenDaysAgo &&
+        transaction.createdAt <= currentDate
     ).length;
   }
   countCompletedTransactionsLast7Days(): number {
@@ -279,8 +271,8 @@ export class TransactionCalculator {
     return this.transactions.filter(
       (transaction) =>
         transaction.status === TransactionStatus.COMPLETED &&
-        transaction.createdAt.toDate() >= sevenDaysAgo &&
-        transaction.createdAt.toDate() <= currentDate
+        transaction.createdAt >= sevenDaysAgo &&
+        transaction.createdAt <= currentDate
     ).length;
   }
   sumTotalSalesCompleted7DaysAgo(): number {
@@ -292,8 +284,8 @@ export class TransactionCalculator {
       .filter(
         (transaction) =>
           transaction.status === TransactionStatus.COMPLETED &&
-          transaction.createdAt.toDate() >= sevenDaysAgo &&
-          transaction.createdAt.toDate() < currentDate
+          transaction.createdAt >= sevenDaysAgo &&
+          transaction.createdAt < currentDate
       )
       .reduce((totalSales, transaction) => {
         const salesForTransaction = transaction.orderList.reduce(
@@ -313,8 +305,8 @@ export class TransactionCalculator {
     const failedOrders = this.transactions.filter(
       (transaction) =>
         transaction.status === TransactionStatus.FAILED &&
-        transaction.createdAt.toDate() >= sevenDaysAgo &&
-        transaction.createdAt.toDate() < currentDate
+        transaction.createdAt >= sevenDaysAgo &&
+        transaction.createdAt < currentDate
     );
 
     const count = failedOrders.length;
@@ -386,7 +378,7 @@ export class TransactionCalculator {
     >();
 
     const filteredTransactions = this.transactions.filter((transaction) => {
-      const transactionDate = transaction.createdAt.toDate();
+      const transactionDate = transaction.createdAt;
       return (
         transactionDate.getFullYear() === currentYear &&
         transactionDate.getMonth() === currentMonth

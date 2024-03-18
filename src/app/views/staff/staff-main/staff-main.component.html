@@ -86,9 +86,9 @@
 
               <span
                 class="badge text-bg-danger"
-                *ngIf="getUnSeenMessages() !== 0"
+                *ngIf="countNewMessages($messages, users$?.id ?? '') !== 0"
               >
-                {{ getUnSeenMessages() }}
+                {{ countNewMessages($messages, users$?.id ?? "") }}
               </span>
             </a>
           </li>

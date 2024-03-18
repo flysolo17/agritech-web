@@ -34,7 +34,7 @@ export class ViewCustomerProfileComponent implements OnInit {
       );
     });
   }
-  convertTimestamp(timestamp: Timestamp) {
+  convertTimestamp(timestamp: Date) {
     return formatTimestamp(timestamp);
   }
   countPending() {

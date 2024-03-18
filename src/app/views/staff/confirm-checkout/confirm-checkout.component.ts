@@ -54,7 +54,7 @@ export class ConfirmCheckoutComponent {
         confirmedBy: this.users?.name ?? '',
         reference: '',
         attachmentURL: '',
-        createdAt: Timestamp.now(),
+        createdAt: new Date(),
         cashReceive: cash,
       };
       let transaction: Transactions = {
@@ -73,7 +73,7 @@ export class ConfirmCheckoutComponent {
           details: paymentDetails,
         },
         details: [details],
-        createdAt: Timestamp.now(),
+        createdAt: new Date(),
       };
       this.activeModal.close(transaction);
     } else {

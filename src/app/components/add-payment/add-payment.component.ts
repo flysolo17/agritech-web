@@ -71,7 +71,7 @@ export class AddPaymentComponent implements OnInit {
       cashReceive: this.cashReceived,
       reference: '',
       attachmentURL: '',
-      createdAt: Timestamp.now(),
+      createdAt: new Date(),
     };
     this.transaction!.payment.status = PaymentStatus.PAID;
     this.transaction!.payment.details = details;

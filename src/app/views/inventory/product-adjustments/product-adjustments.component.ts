@@ -43,7 +43,7 @@ export class ProductAdjustmentsComponent implements OnInit, OnDestroy {
       });
   }
 
-  formatTimeStamp(timestamp: Timestamp) {
+  formatTimeStamp(timestamp: Date) {
     return formatTimestamp(timestamp);
   }
 

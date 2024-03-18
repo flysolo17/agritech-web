@@ -22,5 +22,5 @@ export interface PaymentDetails {
   confirmedBy: string;
   reference: string;
   attachmentURL: string;
-  createdAt: Timestamp;
+  createdAt: Date;
 }

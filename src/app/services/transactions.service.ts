@@ -15,7 +15,10 @@ import {
   updateDoc,
   where,
 } from '@angular/fire/firestore';
-import { Transactions } from '../models/transaction/transactions';
+import {
+  Transactions,
+  transactionConverter,
+} from '../models/transaction/transactions';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { TransactionStatus } from '../models/transaction/transaction_status';
 import { TrasactionDetails } from '../models/transaction/transaction_details';
@@ -40,7 +43,7 @@ export class TransactionsService {
     const q = query(
       collection(this.firestore, this._collection_name),
       orderBy('createdAt', 'asc')
-    );
+    ).withConverter(transactionConverter);
     return collectionData(q) as Observable<Transactions[]>;
   }
   setTransactions(transaction: Transactions[]) {
@@ -51,7 +54,7 @@ export class TransactionsService {
       collection(this.firestore, this._collection_name),
       where('type', 'in', [TransactionType.DELIVERY, TransactionType.PICK_UP]),
       orderBy('createdAt', 'asc')
-    );
+    ).withConverter(transactionConverter);
     return collectionData(q) as Observable<Transactions[]>;
   }
   getPendingOrders(): Observable<Transactions[]> {
@@ -59,7 +62,7 @@ export class TransactionsService {
       collection(this.firestore, this._collection_name),
       where('status', '==', TransactionStatus.PENDING),
       orderBy('createdAt', 'asc')
-    );
+    ).withConverter(transactionConverter);
     return collectionData(q) as Observable<Transactions[]>;
   }
 
@@ -109,7 +112,7 @@ export class TransactionsService {
       collection(this.firestore, this._collection_name),
       where('customerID', '==', customerID),
       orderBy('createdAt', 'desc')
-    );
+    ).withConverter(transactionConverter);
     return collectionData(q) as Observable<Transactions[]>;
   }
   createTransaction(transaction: Transactions) {
@@ -124,7 +127,7 @@ export class TransactionsService {
       collection(this.firestore, this._collection_name),
       where('cashierID', '==', cashierID),
       orderBy('createdAt', 'desc')
-    );
+    ).withConverter(transactionConverter);
     return collectionData(q) as Observable<Transactions[]>;
   }
 
@@ -155,7 +158,7 @@ export class TransactionsService {
       where('orderList', 'array-contains', obj),
       orderBy('createdAt', 'desc'),
       orderBy('updatedAt', 'desc')
-    );
+    ).withConverter(transactionConverter);
     return collectionData(q) as Observable<Transactions[]>;
   }
 
@@ -220,7 +223,7 @@ export class TransactionsService {
       where('createdAt', '>=', startTimestamp),
       where('createdAt', '<=', endTimestamp),
       orderBy('createdAt', 'desc')
-    );
+    ).withConverter(transactionConverter);
 
     return collectionData(q) as Observable<Transactions[]>;
   }

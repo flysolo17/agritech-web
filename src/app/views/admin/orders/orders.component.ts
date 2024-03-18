@@ -94,7 +94,7 @@ export class OrdersComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
-  convertTimestamp(timestamp: Timestamp) {
+  convertTimestamp(timestamp: Date) {
     return formatTimestamp(timestamp);
   }
 
@@ -360,9 +360,13 @@ export class OrdersComponent implements OnInit {
   }
 
   //added
-  private isWithinLastSevenDays(timestamp: Timestamp): boolean {
-    const oneWeekAgo = Timestamp.now().toMillis() - 7 * 24 * 60 * 60 * 1000;
-    return timestamp.toMillis() >= oneWeekAgo;
+  private isWithinLastSevenDays(timestamp: any): boolean {
+    if (!(timestamp instanceof Date)) {
+      return false; // If timestamp is not a Date object, return false
+    }
+
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return timestamp.getTime() >= oneWeekAgo;
   }
 
   //pending orders

@@ -1,11 +1,13 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Timestamp } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentType } from 'src/app/models/transaction/payment';
 import { TransactionType } from 'src/app/models/transaction/transaction_type';
 import { Transactions } from 'src/app/models/transaction/transactions';
 import { Address } from 'src/app/models/user_address';
 import { PdfExportService } from 'src/app/services/review-transaction/pdf-export-service.service';
+import { formatTimestamp } from 'src/app/utils/constants';
 
 @Component({
   selector: 'app-review-transaction',
@@ -58,5 +60,20 @@ export class ReviewTransactionComponent implements OnInit {
 
   goBack(): void {
     this.location.back();
+  }
+  openLinkInNewTab(link: string): void {
+    window.open(link, '_blank');
+  }
+  format(date?: any) {
+    if (typeof date === 'string') {
+      return formatTimestamp(new Date(date as string));
+    }
+    if (date instanceof Date) {
+      return formatTimestamp(date);
+    }
+    if (date instanceof Timestamp) {
+      return formatTimestamp(date.toDate());
+    }
+    return '----';
   }
 }

@@ -67,13 +67,21 @@
           <h6>
             Confirmed by: {{ _transaction?.payment?.details?.confirmedBy }}
           </h6>
-          <h6>Payment Method: {{ _transaction?.payment?.type }}</h6>
-          <button
-            class="btn btn-sm btn-light text-success"
-            *ngIf="isGcash(_transaction?.payment?.type!)"
-          >
-            View Receipt
-          </button>
+          <h6>
+            Payment Method: {{ _transaction?.payment?.type }}
+            <button
+              class="btn btn-sm btn-light text-success"
+              *ngIf="_transaction?.payment?.details?.attachmentURL !== ''"
+              (click)="
+                openLinkInNewTab(
+                  _transaction?.payment?.details?.attachmentURL ?? ''
+                )
+              "
+            >
+              View Receipt
+            </button>
+          </h6>
+
           <h6>Status: {{ _transaction?.payment?.status }}</h6>
           <h6>
             Amount:
@@ -91,11 +99,7 @@
           </h6>
           <h6>
             Date:
-            {{
-              _transaction?.payment?.details?.createdAt
-                ?.toDate()
-                ?.toLocaleDateString()
-            }}
+            {{ format(_transaction?.payment?.details?.createdAt) }}
           </h6>
         </div>
       </div>

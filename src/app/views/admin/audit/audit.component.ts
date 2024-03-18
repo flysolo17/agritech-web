@@ -42,7 +42,7 @@ export class AuditComponent implements OnInit {
     });
   }
 
-  formatTimeStamp(timestamp: Timestamp) {
+  formatTimeStamp(timestamp: Date) {
     return formatTimestamp(timestamp);
   }
 

@@ -20,7 +20,7 @@
         <h6 class="p-3">Recent</h6>
         <ul
           class="list-group list-group-flush"
-          *ngFor="let chats of userWithMessages$; index as index"
+          *ngFor="let chats of messages$; index as index"
         >
           <li
             class="list-group-item"
@@ -81,13 +81,13 @@
       >
         <img
           [src]="
-            userWithMessages$[selectedConvo].customers.profile
-              ? userWithMessages$[selectedConvo].customers.profile
+            messages$[selectedConvo].customers.profile
+              ? messages$[selectedConvo].customers.profile
               : './../../assets/images/profile.jpg'
           "
           class="profile2 me-3"
         />
-        {{ userWithMessages$[selectedConvo].customers.name }}
+        {{ messages$[selectedConvo].customers.name }}
       </div>
       <div
         class="flex-grow-1 h-25 overflow-y-auto"
@@ -97,7 +97,7 @@
           <li
             class="list-group-item"
             *ngFor="
-              let message of userWithMessages$[selectedConvo].messages;
+              let message of messages$[selectedConvo].messages;
               index as index
             "
           >
@@ -136,7 +136,7 @@
             (click)="
               sendMessage(
                 message.value,
-                userWithMessages$[selectedConvo].customers.id,
+                messages$[selectedConvo].customers.id,
                 selectedConvo
               )
             "

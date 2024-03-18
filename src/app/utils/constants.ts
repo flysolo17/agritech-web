@@ -27,8 +27,7 @@ export function generateInvoiceID() {
   return invoiceID;
 }
 
-export function formatTimestamp(timestamp: Timestamp): string {
-  const date = timestamp.toDate();
+export function formatTimestamp(date: Date): string {
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
@@ -36,7 +35,7 @@ export function formatTimestamp(timestamp: Timestamp): string {
     hour: '2-digit',
     minute: '2-digit',
   };
-  return date.toLocaleDateString('en-US', options);
+  return date.toLocaleString('en-US', options);
 }
 
 export function convertTimestampToDate(timestamp: Timestamp): Date {

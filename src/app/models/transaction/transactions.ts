@@ -25,10 +25,27 @@ export interface Transactions {
   details: TrasactionDetails[];
   shippingFee?: ShippingFee;
   address?: Address;
-  createdAt: Timestamp;
+  createdAt: Date;
   schedule?: TransactionSchedule;
 }
+
 export const transactionConverter = {
-  toFirestore: (data: Transaction) => data,
-  fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Transaction,
+  toFirestore: (data: Transactions) => data,
+  fromFirestore: (snap: QueryDocumentSnapshot) => {
+    const data = snap.data() as Transactions;
+
+    if (data.createdAt instanceof Timestamp) {
+      data.createdAt = data.createdAt.toDate();
+    }
+
+    if (
+      data.payment &&
+      data.payment.details &&
+      data.payment.details.createdAt instanceof Timestamp
+    ) {
+      data.payment.details.createdAt = data.payment.details.createdAt.toDate();
+    }
+
+    return data;
+  },
 };

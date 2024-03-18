@@ -57,7 +57,7 @@ export class TransactionsComponent implements OnInit {
       this.dataSource = data;
       this.recentTransactions = data.filter(
         (e) =>
-          e.createdAt.toDate() >= startOfDay(new Date()) &&
+          e.createdAt >= startOfDay(new Date()) &&
           e.cashierID == this._users?.id
       );
     });
@@ -141,7 +141,7 @@ export class TransactionsComponent implements OnInit {
   }
 
   // Public method to convert timestamp to a formatted string
-  convertTimestamp(timestamp: Timestamp): string {
+  convertTimestamp(timestamp: Date): string {
     return formatTimestamp(timestamp);
   }
 
@@ -156,7 +156,7 @@ export class TransactionsComponent implements OnInit {
   getTransactionsMadeToday(): Transactions[] {
     const currentDate = new Date();
     return this._transactionList.filter((transaction) => {
-      const transactionDate = transaction.createdAt.toDate();
+      const transactionDate = transaction.createdAt;
 
       return (
         transactionDate.getDate() === currentDate.getDate() &&

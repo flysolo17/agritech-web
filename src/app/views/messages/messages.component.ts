@@ -27,15 +27,15 @@ export class MessagesComponent implements OnInit, OnDestroy {
   selectedUser: Users | null = null;
   searchText: string = '';
   $customers: Customers[] = [];
-  $messages: Messages[] = [];
-  userWithMessages$: UserWithMessages[] = [];
+
+  messages$: UserWithMessages[] = [];
   ALL$: UserWithMessages[] = [];
   users$: Users | null = null;
   messageSubscription$: Subscription;
   selectedConvo: number = -1;
   selectConvo(index: number) {
     this.selectedConvo = index;
-    console.log(this.userWithMessages$[index].messages);
+    console.log(this.messages$[index].messages);
     this.cdr.detectChanges();
   }
   constructor(
@@ -48,58 +48,21 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.users$ = data;
     });
     this.messageSubscription$ = new Subscription();
+    messagesService.messages$.subscribe((data) => {
+      this.messages$ = data;
+    });
   }
   ngOnDestroy(): void {
     this.messageSubscription$.unsubscribe();
   }
 
-  ngOnInit(): void {
-    this.messageSubscription$ = combineLatest([
-      this.messagesService.getAllCustomer(),
-      this.messagesService.messages$,
-    ])
-      .pipe(
-        map(([customers, messages]) => {
-          const userWithMessages = customers.map((customer) => {
-            const filteredMessages = messages.filter(
-              (message) =>
-                message.senderID === customer.id ||
-                message.receiverID === customer.id
-            );
-
-            return {
-              customers: customer,
-              messages: filteredMessages.reverse(),
-            };
-          });
-
-          userWithMessages.sort((a, b) => {
-            const timestampA =
-              a.messages.length > 0
-                ? a.messages[0].createdAt.toDate().getTime()
-                : 0;
-            const timestampB =
-              b.messages.length > 0
-                ? b.messages[0].createdAt.toDate().getTime()
-                : 0;
-            return timestampB - timestampA;
-          });
-
-          return userWithMessages;
-        })
-      )
-      .subscribe((data) => {
-        this.userWithMessages$ = data;
-        this.ALL$ = data;
-        this.cdr.detectChanges();
-      });
-  }
+  ngOnInit(): void {}
 
   search() {
     if (this.searchText === '') {
-      this.userWithMessages$ = this.ALL$;
+      this.messages$ = this.ALL$;
     } else {
-      this.userWithMessages$ = this.ALL$.filter((e) => {
+      this.messages$ = this.ALL$.filter((e) => {
         return e.customers.name
           .toLowerCase()
           .includes(this.searchText.toLowerCase());
@@ -121,7 +84,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
       seen: false,
       createdAt: Timestamp.now(),
     };
-
     this.messagesService
       .sendMessage(message)
       .then(() => {

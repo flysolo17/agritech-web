@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { Auth, User, user } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
+import { UserWithMessages } from 'src/app/models/UserWithMessages';
 import { Messages } from 'src/app/models/messages';
 import { TransactionStatus } from 'src/app/models/transaction/transaction_status';
 import { Transactions } from 'src/app/models/transaction/transactions';
@@ -24,9 +25,8 @@ import { removeDuplicateMessages } from 'src/app/utils/constants';
 export class AdminMainComponent implements OnInit {
   users$: Users | null = null;
 
-  $messages: Messages[] = [];
   transactionSubscription: Subscription;
-
+  $messages: UserWithMessages[] = [];
   $transactions: Transactions[] = [];
   constructor(
     private authService: AuthService,
@@ -45,34 +45,29 @@ export class AdminMainComponent implements OnInit {
       });
     authService.users$.subscribe((data) => {
       this.users$ = data;
-      this.listenToMessages(data?.id ?? '');
+      messageService
+        .getCustomerWithMessages(data?.id ?? '')
+        .subscribe((data) => {
+          this.$messages = data;
+          messageService.updateMessages(this.$messages);
+        });
     });
   }
 
   ngOnInit(): void {}
 
-  getUnSeenMessages() {
-    return this.$messages.filter((e) => e.senderID !== this.users$?.id).length;
-  }
-
   logout() {
     this.authService.logout();
   }
-
-  // getUserProfile(uid: string) {
-  //   this.authService.getUserAccount(uid).then((data) => {
-  //     if (data.exists()) {
-  //       let current: Users = data.data();
-  //       this.authService.setUsers(current);
-  //       this.listenToMessages(current.id);
-  //     }
-  //   });
-  // }
-  listenToMessages(uid: string) {
-    this.messageService.getAllMyMessages(uid).subscribe((data) => {
-      this.$messages = removeDuplicateMessages(data);
-      this.messageService.updateMessages(data);
-      this.cdr.detectChanges();
+  countNewMessages(messages: UserWithMessages[], uid: string): number {
+    let total = 0;
+    messages.map((data) => {
+      if (data.messages.length !== 0) {
+        if (data.messages[data.messages.length - 1].senderID !== uid) {
+          total += 1;
+        }
+      }
     });
+    return total;
   }
 }
