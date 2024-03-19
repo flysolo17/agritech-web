@@ -72,6 +72,9 @@ export class OrdersComponent implements OnInit {
         this.toastrService.error(err.toString());
       });
   }
+   openLinkInNewTab(link: string): void {
+    window.open(link, '_blank');
+  }
   addDriver(transaction: Transactions) {
     const modal = this.modalService.open(AddDriverComponent);
     modal.result
