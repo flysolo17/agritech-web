@@ -76,7 +76,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   sendMessage(data: string, to: string | null, current: number) {
     let message: Messages = {
-      id: '',
+      id: `${to}${this.users$?.id}`,
       senderID: this.users$?.id ?? '',
       receiverID: to ?? '',
       role: Role.STAFF,
